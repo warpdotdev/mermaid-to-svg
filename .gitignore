@@ -1,0 +1,17 @@
+/target
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Generated visual comparison output
+/output/
+
+# PNG Visual Comparison Protocol validation runs
+validation_runs/
+
+# Vendored JS sources for straight-port work (downloaded via scripts/vendor_mermaid_js.sh)
+third_party/mermaid-js/
+
+# Node modules (used by reference SVG generation script)
+node_modules/
