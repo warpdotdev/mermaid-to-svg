@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="70" viewBox="0 0 1200 70" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M108.0,35.0L154.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M258.0,35.0L308.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M400.0,35.0L446.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3" marker-end="url(#arrowhead)"/>
+<path d="M606.0,35.0L656.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3"/>
+<path d="M804.0,35.0L848.5,35.0" fill="none" stroke="#333333" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead-thick)"/>
+<path d="M1002.0,35.0L1052.0,35.0" fill="none" stroke="#333333" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="8.0" y="8.0" width="100.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="58.0" y="35.0">Start</tspan>
+</text>
+<rect x="158.0" y="8.0" width="100.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="208.0" y="35.0">Arrow</tspan>
+</text>
+<rect x="308.0" y="8.0" width="92.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="354.0" y="35.0">Line</tspan>
+</text>
+<rect x="450.0" y="8.0" width="156.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="528.0" y="35.0">Dotted Arrow</tspan>
+</text>
+<rect x="656.0" y="8.0" width="148.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="730.0" y="35.0">Dotted Line</tspan>
+</text>
+<rect x="854.0" y="8.0" width="148.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="928.0" y="35.0">Thick Arrow</tspan>
+</text>
+<rect x="1052.0" y="8.0" width="140.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="1122.0" y="35.0">Thick Line</tspan>
+</text>
+</svg>
+

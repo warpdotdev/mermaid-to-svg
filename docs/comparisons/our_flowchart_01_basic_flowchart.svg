@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="132" height="278" viewBox="0 0 132 278" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M66.0,62.0L66.0,108.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M66.0,166.0L66.0,212.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="16.0" y="8.0" width="100.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="66.0" y="35.0">Start</tspan>
+</text>
+<rect x="8.0" y="112.0" width="116.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="66.0" y="139.0">Process</tspan>
+</text>
+<rect x="24.0" y="216.0" width="84.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="66.0" y="243.0">End</tspan>
+</text>
+</svg>
+

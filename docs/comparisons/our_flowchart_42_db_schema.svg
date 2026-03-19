@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="361" height="568" viewBox="0 0 361 568" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M63.0,123.0L67.2,119.9C71.3,116.9 79.7,110.8 89.3,107.7C99.0,104.7 110.0,104.7 115.5,104.7L121.0,104.7" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M47.8,174.1L54.5,191.0C61.2,207.9 74.6,241.7 84.8,258.6C95.0,275.5 102.0,275.5 105.5,275.5L109.0,275.5" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M188.0,77.0L194.2,71.6C200.3,66.1 212.7,55.3 222.3,49.9C232.0,44.4 239.0,44.4 242.5,44.4L246.0,44.4" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M195.2,370.4L200.1,366.0C205.1,361.6 215.1,352.9 231.1,305.3C247.1,257.7 269.1,171.2 280.2,128.0L291.2,84.8" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M196.0,404.4L250.0,404.4" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M175.8,438.4L184.0,452.8C192.2,467.3 208.6,496.1 221.6,510.6C234.7,525.0 244.3,525.0 249.2,525.0L254.0,525.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M188.0,132.4L194.2,137.8C200.3,143.2 212.7,154.1 224.3,159.5C236.0,164.9 247.0,164.9 252.5,164.9L258.0,164.9" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M168.8,136.7L178.1,161.3C187.5,185.8 206.3,234.8 220.5,259.3C234.7,283.8 244.3,283.8 249.2,283.8L254.0,283.8" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M 113.0 251.5 L 113.0 299.5 A 43.5 10.9 0 0 0 200.0 299.5 L 200.0 251.5 A 43.5 10.9 0 0 0 113.0 251.5 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="156.5" cy="251.5" rx="43.5" ry="10.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="156.5" y="275.5">Addresses</tspan>
+</text>
+<path d="M 254.0 380.6 L 254.0 428.2 A 47.5 11.9 0 0 0 349.0 428.2 L 349.0 380.6 A 47.5 11.9 0 0 0 254.0 380.6 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="301.5" cy="380.6" rx="47.5" ry="11.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="301.5" y="404.4">Categories</tspan>
+</text>
+<path d="M 258.0 501.0 L 258.0 549.0 A 43.5 10.9 0 0 0 345.0 549.0 L 345.0 501.0 A 43.5 10.9 0 0 0 258.0 501.0 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="301.5" cy="501.0" rx="43.5" ry="10.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="301.5" y="525.0">Inventory</tspan>
+</text>
+<path d="M 250.0 20.9 L 250.0 68.0 A 51.5 12.9 0 0 0 353.0 68.0 L 353.0 20.9 A 51.5 12.9 0 0 0 250.0 20.9 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="301.5" cy="20.9" rx="51.5" ry="12.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="301.5" y="44.4">Order Items</tspan>
+</text>
+<path d="M 125.0 80.5 L 125.0 128.9 A 31.5 7.9 0 0 0 188.0 128.9 L 188.0 80.5 A 31.5 7.9 0 0 0 125.0 80.5 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="156.5" cy="80.5" rx="31.5" ry="7.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="156.5" y="104.7">Orders</tspan>
+</text>
+<path d="M 262.0 140.8 L 262.0 189.1 A 39.5 9.9 0 0 0 341.0 189.1 L 341.0 140.8 A 39.5 9.9 0 0 0 262.0 140.8 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="301.5" cy="140.8" rx="39.5" ry="9.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="301.5" y="164.9">Payments</tspan>
+</text>
+<path d="M 117.0 380.3 L 117.0 428.5 A 39.5 9.9 0 0 0 196.0 428.5 L 196.0 380.3 A 39.5 9.9 0 0 0 117.0 380.3 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="156.5" cy="380.3" rx="39.5" ry="9.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="156.5" y="404.4">Products</tspan>
+</text>
+<path d="M 258.0 259.8 L 258.0 307.8 A 43.5 10.9 0 0 0 345.0 307.8 L 345.0 259.8 A 43.5 10.9 0 0 0 258.0 259.8 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="301.5" cy="259.8" rx="43.5" ry="10.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="301.5" y="283.8">Shipments</tspan>
+</text>
+<path d="M 8.0 119.1 L 8.0 167.2 A 27.5 6.9 0 0 0 63.0 167.2 L 63.0 119.1 A 27.5 6.9 0 0 0 8.0 119.1 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="35.5" cy="119.1" rx="27.5" ry="6.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="35.5" y="143.2">Users</tspan>
+</text>
+</svg>
+

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1886" height="70" viewBox="0 0 1886 70" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M116.0,35.0L162.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M274.0,35.0L320.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M432.0,35.0L478.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M590.0,35.0L636.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M748.0,35.0L794.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M906.0,35.0L952.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M1064.0,35.0L1110.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M1222.0,35.0L1268.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M1380.0,35.0L1426.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M1546.0,35.0L1592.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M1712.0,35.0L1758.0,35.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="8.0" y="8.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="62.0" y="35.0">Step 1</tspan>
+</text>
+<rect x="1430.0" y="8.0" width="116.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="1488.0" y="35.0">Step 10</tspan>
+</text>
+<rect x="1596.0" y="8.0" width="116.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="1654.0" y="35.0">Step 11</tspan>
+</text>
+<rect x="1762.0" y="8.0" width="116.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="1820.0" y="35.0">Step 12</tspan>
+</text>
+<rect x="166.0" y="8.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="220.0" y="35.0">Step 2</tspan>
+</text>
+<rect x="324.0" y="8.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="378.0" y="35.0">Step 3</tspan>
+</text>
+<rect x="482.0" y="8.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="536.0" y="35.0">Step 4</tspan>
+</text>
+<rect x="640.0" y="8.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="694.0" y="35.0">Step 5</tspan>
+</text>
+<rect x="798.0" y="8.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="852.0" y="35.0">Step 6</tspan>
+</text>
+<rect x="956.0" y="8.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="1010.0" y="35.0">Step 7</tspan>
+</text>
+<rect x="1114.0" y="8.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="1168.0" y="35.0">Step 8</tspan>
+</text>
+<rect x="1272.0" y="8.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="1326.0" y="35.0">Step 9</tspan>
+</text>
+</svg>
+

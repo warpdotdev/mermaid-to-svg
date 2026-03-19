@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="508" height="742" viewBox="0 0 508 742" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M342.0,52.8L323.5,58.5C305.0,64.2 268.0,75.6 249.5,84.8C231.0,94.0 231.0,101.0 231.0,104.5L231.0,108.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M218.3,265.3L216.8,273.9C215.2,282.5 212.1,299.8 210.6,314.2C209.0,328.7 209.0,340.3 209.0,346.2L209.0,352.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M267.4,241.6L277.3,254.1C287.1,266.7 306.8,291.9 325.5,317.7C344.2,343.6 362.0,370.1 370.9,383.4L379.7,396.7" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M173.3,462.3L160.8,474.8C148.2,487.2 123.1,512.1 110.6,530.4C98.0,548.7 98.0,560.3 98.0,566.2L98.0,572.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M244.7,462.3L257.2,474.8C269.8,487.2 294.9,512.1 307.4,530.4C320.0,548.7 320.0,560.3 320.0,566.2L320.0,572.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M98.0,630.0L98.0,634.2C98.0,638.3 98.0,646.7 106.3,654.7C114.6,662.8 131.2,670.5 139.5,674.4L147.7,678.3" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M448.7,400.0L452.3,398.0C455.8,396.1 462.9,392.1 471.5,383.5C480.0,374.9 490.0,361.5 495.0,348.4C500.0,335.3 500.0,322.3 500.0,302.8C500.0,283.3 500.0,257.1 500.0,231.0C500.0,204.9 500.0,178.7 500.0,159.2C500.0,139.7 500.0,126.7 493.0,113.6C486.0,100.5 472.0,87.1 462.6,78.9C453.2,70.6 448.5,67.4 446.1,65.8L443.7,64.2" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M320.0,630.0L320.0,634.2C320.0,638.3 320.0,646.7 311.7,654.7C303.4,662.8 286.8,670.5 278.5,674.4L270.3,678.3" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="342.0" y="8.0" width="116.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="400.0" y="35.0">Request</tspan>
+</text>
+<polygon points="231.0,112.0 314.0,195.0 231.0,278.0 148.0,195.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="231.0" y="195.0">Authenticated?</tspan>
+</text>
+<polygon points="209.0,356.0 280.0,427.0 209.0,498.0 138.0,427.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="209.0" y="427.0">Authorized?</tspan>
+</text>
+<rect x="330.0" y="400.0" width="140.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="400.0" y="427.0">Login Page</tspan>
+</text>
+<rect x="8.0" y="576.0" width="180.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="98.0" y="603.0">Process Request</tspan>
+</text>
+<rect x="238.0" y="576.0" width="164.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="320.0" y="603.0">Access Denied</tspan>
+</text>
+<rect x="119.0" y="680.0" width="180.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="209.0" y="707.0">Return Response</tspan>
+</text>
+<rect x="195.0" y="303.0" width="28.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="209.0" y="317.0">Yes</tspan>
+</text>
+<rect x="316.5" y="303.0" width="20.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="326.5" y="317.0">No</tspan>
+</text>
+<rect x="84.0" y="523.0" width="28.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="98.0" y="537.0">Yes</tspan>
+</text>
+<rect x="310.0" y="523.0" width="20.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="320.0" y="537.0">No</tspan>
+</text>
+</svg>
+

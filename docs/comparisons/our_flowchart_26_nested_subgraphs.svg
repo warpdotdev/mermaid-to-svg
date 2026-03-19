@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="156" height="740" viewBox="0 0 156 740" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<rect x="8.0" y="98.0" width="140.0" height="496.0" fill="#ffffde" stroke="#aaaa33" stroke-width="1"/>\n<rect x="16.0" y="130.0" width="124.0" height="198.0" fill="#ffffde" stroke="#aaaa33" stroke-width="1"/>\n<rect x="16.0" y="388.0" width="124.0" height="198.0" fill="#ffffde" stroke="#aaaa33" stroke-width="1"/>\n<path d="M78.0,216.0L78.0,262.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M78.0,474.0L78.0,520.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M78.0,320.0L78.0,416.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M78.0,62.0L78.0,158.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M78.0,578.0L78.0,674.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="24.0" y="162.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="78.0" y="189.0">Node A</tspan>
+</text>
+<rect x="24.0" y="266.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="78.0" y="293.0">Node B</tspan>
+</text>
+<rect x="24.0" y="420.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="78.0" y="447.0">Node C</tspan>
+</text>
+<rect x="24.0" y="524.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="78.0" y="551.0">Node D</tspan>
+</text>
+<rect x="16.0" y="8.0" width="124.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="78.0" y="35.0">External</tspan>
+</text>
+<rect x="24.0" y="678.0" width="108.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="78.0" y="705.0">Output</tspan>
+</text>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="78.0" y="110.0">Outer</tspan>
+</text>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="78.0" y="142.0">Inner1</tspan>
+</text>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="78.0" y="400.0">Inner2</tspan>
+</text>
+</svg>
+

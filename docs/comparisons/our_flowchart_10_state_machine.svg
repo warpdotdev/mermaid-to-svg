@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="418" height="170" viewBox="0 0 418 170" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M47.3,79.4L52.8,73.4C58.2,67.4 69.1,55.5 78.1,49.5C87.0,43.5 94.0,43.5 97.5,43.5L101.0,43.5" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M176.0,43.5L222.0,43.5" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M246.6,73.1L246.5,73.4C246.4,73.7 246.2,74.4 244.0,80.3C241.9,86.3 238.0,97.7 234.0,103.3C230.1,109.0 226.3,109.0 220.4,109.0C214.6,109.0 206.8,109.0 199.0,109.0C191.2,109.0 183.4,109.0 177.6,109.0C171.7,109.0 167.9,109.0 164.0,104.0C160.0,99.0 156.1,89.0 154.0,83.7C151.9,78.4 151.7,77.8 151.6,77.5L151.5,77.2" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M164.4,69.8L170.5,76.5C176.6,83.2 188.8,96.6 204.3,103.3C219.8,110.0 238.7,110.0 257.5,110.0C276.3,110.0 295.2,110.0 308.2,109.2C321.3,108.4 328.6,106.8 332.3,106.0L335.9,105.2" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M289.0,43.5L293.2,43.5C297.3,43.5 305.7,43.5 315.0,48.0C324.3,52.6 334.6,61.6 339.7,66.1L344.8,70.7" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M350.0,122.4L348.4,124.0C346.8,125.7 343.7,129.0 336.3,135.6C328.9,142.2 317.2,152.2 305.7,157.2C294.2,162.2 282.9,162.2 265.8,162.2C248.7,162.2 225.9,162.2 203.0,162.2C180.1,162.2 157.3,162.2 140.2,162.2C123.1,162.2 111.8,162.2 100.3,155.2C88.8,148.2 77.1,134.2 69.4,125.9C61.7,117.6 57.9,115.0 56.0,113.7L54.1,112.4" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<circle cx="31.5" cy="96.8" r="23.5" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="31.5" y="96.8">Idle</tspan>
+</text>
+<circle cx="257.5" cy="43.5" r="31.5" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="257.5" y="43.5">Paused</tspan>
+</text>
+<circle cx="140.5" cy="43.5" r="35.5" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="140.5" y="43.5">Running</tspan>
+</text>
+<circle cx="374.5" cy="96.8" r="35.5" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="374.5" y="96.8">Stopped</tspan>
+</text>
+</svg>
+

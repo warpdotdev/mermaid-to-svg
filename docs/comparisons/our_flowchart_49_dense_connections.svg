@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="361" height="694" viewBox="0 0 361 694" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M285.0,57.4L277.5,62.3C270.0,67.3 255.0,77.1 247.5,85.6C240.0,94.0 240.0,101.0 240.0,104.5L240.0,108.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M313.8,62.0L313.0,66.2C312.2,70.3 310.6,78.7 309.8,91.5C309.0,104.3 309.0,121.7 309.0,139.0C309.0,156.3 309.0,173.7 294.7,188.4C280.4,203.0 251.8,215.1 237.5,221.1L223.2,227.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M324.2,62.0L325.0,66.2C325.8,70.3 327.4,78.7 328.2,91.5C329.0,104.3 329.0,121.7 329.0,139.0C329.0,156.3 329.0,173.7 329.0,191.0C329.0,208.3 329.0,225.7 329.0,243.0C329.0,260.3 329.0,277.7 299.0,293.5C269.0,309.3 208.9,323.6 178.9,330.8L148.9,338.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M211.7,166.0L207.3,170.2C203.0,174.3 194.2,182.7 189.9,190.3C185.5,198.0 185.5,205.0 185.5,208.5L185.5,212.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M247.5,166.0L248.7,170.2C249.9,174.3 252.2,182.7 253.3,195.5C254.5,208.3 254.5,225.7 254.5,243.0C254.5,260.3 254.5,277.7 236.9,292.7C219.3,307.8 184.0,320.5 166.4,326.9L148.8,333.3" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M257.9,166.0L260.7,170.2C263.4,174.3 269.0,182.7 271.7,195.5C274.5,208.3 274.5,225.7 274.5,243.0C274.5,260.3 274.5,277.7 274.5,295.0C274.5,312.3 274.5,329.7 274.5,347.0C274.5,364.3 274.5,381.7 247.8,397.3C221.1,413.0 167.7,427.0 141.1,434.0L114.4,441.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M151.5,268.3L145.5,272.7C139.5,277.2 127.5,286.1 121.2,294.0C114.9,302.0 114.3,309.0 114.0,312.5L113.7,316.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M193.0,270.0L194.2,274.2C195.4,278.3 197.7,286.7 198.8,299.5C200.0,312.3 200.0,329.7 200.0,347.0C200.0,364.3 200.0,381.7 185.7,396.4C171.4,411.0 142.8,423.1 128.5,429.1L114.2,435.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M203.4,270.0L206.2,274.2C208.9,278.3 214.5,286.7 217.2,299.5C220.0,312.3 220.0,329.7 220.0,347.0C220.0,364.3 220.0,381.7 220.0,399.0C220.0,416.3 220.0,433.7 220.0,451.0C220.0,468.3 220.0,485.7 196.6,501.2C173.3,516.6 126.6,530.3 103.2,537.1L79.8,543.9" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M95.4,374.0L93.0,378.2C90.6,382.3 85.8,390.7 83.1,398.3C80.4,406.0 79.8,413.0 79.5,416.5L79.2,420.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M134.1,374.0L137.7,378.2C141.2,382.3 148.4,390.7 151.9,403.5C155.5,416.3 155.5,433.7 155.5,451.0C155.5,468.3 155.5,485.7 142.9,500.1C130.2,514.6 104.9,526.2 92.3,532.0L79.6,537.8" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M60.9,478.0L58.5,482.2C56.1,486.3 51.3,494.7 48.6,502.3C45.9,510.0 45.3,517.0 45.0,520.5L44.7,524.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M94.4,478.0L97.2,482.2C99.9,486.3 105.5,494.7 108.2,507.5C111.0,520.3 111.0,537.7 111.0,555.0C111.0,572.3 111.0,589.7 108.6,601.9C106.2,614.2 101.4,621.4 99.0,625.1L96.6,628.7" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M42.0,582.0L42.0,586.2C42.0,590.3 42.0,598.7 44.4,606.4C46.8,614.2 51.6,621.4 54.0,625.1L56.4,628.7" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="285.0" y="8.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="319.0" y="35.0">A</tspan>
+</text>
+<rect x="206.0" y="112.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="240.0" y="139.0">B</tspan>
+</text>
+<rect x="151.5" y="216.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="185.5" y="243.0">C</tspan>
+</text>
+<rect x="77.0" y="320.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="111.0" y="347.0">D</tspan>
+</text>
+<rect x="42.5" y="424.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="76.5" y="451.0">E</tspan>
+</text>
+<rect x="8.0" y="528.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="42.0" y="555.0">F</tspan>
+</text>
+<rect x="42.5" y="632.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="76.5" y="659.0">G</tspan>
+</text>
+</svg>
+

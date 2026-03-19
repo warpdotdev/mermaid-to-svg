@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="320" height="878" viewBox="0 0 320 878" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M160.0,62.0L160.0,108.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M137.8,207.8L131.7,218.0C125.6,228.2 113.3,248.6 107.1,264.6C101.0,280.7 101.0,292.3 101.0,298.2L101.0,304.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M182.2,207.8L188.3,218.0C194.4,228.2 206.7,248.6 212.9,264.6C219.0,280.7 219.0,292.3 219.0,298.2L219.0,304.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M101.0,362.0L101.0,366.2C101.0,370.3 101.0,378.7 106.4,390.5C111.8,402.4 122.6,417.7 128.0,425.4L133.4,433.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M219.0,362.0L219.0,366.2C219.0,370.3 219.0,378.7 213.6,390.5C208.2,402.4 197.4,417.7 192.0,425.4L186.6,433.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M127.8,497.8L113.5,509.6C99.2,521.5 70.6,545.3 56.3,563.0C42.0,580.7 42.0,592.3 42.0,598.2L42.0,604.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M160.0,530.0L160.0,604.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M192.2,497.8L206.5,509.6C220.8,521.5 249.4,545.3 263.7,563.0C278.0,580.7 278.0,592.3 278.0,598.2L278.0,604.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M42.0,662.0L42.0,666.2C42.0,670.3 42.0,678.7 52.7,687.6C63.4,696.5 84.9,705.9 95.6,710.6L106.3,715.4" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M160.0,662.0L160.0,708.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M278.0,662.0L278.0,666.2C278.0,670.3 278.0,678.7 267.3,687.6C256.6,696.5 235.1,705.9 224.4,710.6L213.7,715.4" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M160.0,766.0L160.0,812.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<polygon points="160.0,112.0 219.0,171.0 160.0,230.0 101.0,171.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="160.0" y="171.0">Branch 1</tspan>
+</text>
+<rect x="67.0" y="308.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="101.0" y="335.0">B</tspan>
+</text>
+<rect x="185.0" y="308.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="219.0" y="335.0">C</tspan>
+</text>
+<polygon points="160.0,412.0 219.0,471.0 160.0,530.0 101.0,471.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="160.0" y="471.0">Branch 2</tspan>
+</text>
+<rect x="8.0" y="608.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="42.0" y="635.0">E</tspan>
+</text>
+<rect x="118.0" y="816.0" width="84.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="160.0" y="843.0">End</tspan>
+</text>
+<rect x="126.0" y="608.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="160.0" y="635.0">F</tspan>
+</text>
+<rect x="244.0" y="608.0" width="68.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="278.0" y="635.0">G</tspan>
+</text>
+<rect x="110.0" y="712.0" width="100.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="160.0" y="739.0">Merge</tspan>
+</text>
+<rect x="110.0" y="8.0" width="100.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="160.0" y="35.0">Start</tspan>
+</text>
+<rect x="83.0" y="255.0" width="36.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="101.0" y="269.0">Left</tspan>
+</text>
+<rect x="197.0" y="255.0" width="44.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="219.0" y="269.0">Right</tspan>
+</text>
+<rect x="8.0" y="555.0" width="68.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="42.0" y="569.0">Option 1</tspan>
+</text>
+<rect x="126.0" y="555.0" width="68.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="160.0" y="569.0">Option 2</tspan>
+</text>
+<rect x="244.0" y="555.0" width="68.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="278.0" y="569.0">Option 3</tspan>
+</text>
+</svg>
+

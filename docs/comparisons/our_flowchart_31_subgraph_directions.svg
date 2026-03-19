@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="985" height="338" viewBox="0 0 985 338" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<rect x="25.0" y="28.2" width="172.0" height="302.0" fill="#ffffde" stroke="#aaaa33" stroke-width="1"/>\n<rect x="281.0" y="132.2" width="472.0" height="94.0" fill="#ffffde" stroke="#aaaa33" stroke-width="1"/>\n<rect x="837.0" y="80.2" width="140.0" height="198.0" fill="#ffffde" stroke="#aaaa33" stroke-width="1"/>\n<path d="M181.0,89.1L186.5,89.3C192.0,89.4 203.0,89.7 212.7,89.9C222.3,90.0 230.7,90.0 239.0,90.0C247.3,90.0 255.7,90.0 268.6,101.8C281.5,113.7 299.1,137.4 307.8,149.2L316.6,161.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M177.0,191.2L285.0,191.2" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M189.0,297.3L193.2,297.4C197.3,297.6 205.7,297.8 214.0,297.9C222.3,298.0 230.7,298.0 239.0,298.0C247.3,298.0 255.7,298.0 268.8,285.3C281.9,272.5 299.8,247.0 308.8,234.3L317.7,221.5" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M389.0,191.2L435.0,191.2" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M563.0,191.2L609.0,191.2" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M719.8,164.2L728.2,158.7C736.5,153.2 753.3,142.1 765.8,136.5C778.3,131.0 786.7,131.0 795.0,131.0C803.3,131.0 811.7,131.0 819.3,131.3C827.0,131.7 834.0,132.3 837.5,132.7L841.0,133.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M735.2,218.2L741.0,221.0C746.8,223.8 758.4,229.4 768.4,232.2C778.3,235.0 786.7,235.0 795.0,235.0C803.3,235.0 811.7,235.0 821.3,235.5C831.0,236.0 842.0,237.1 847.5,237.6L853.0,238.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="41.0" y="60.2" width="140.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="111.0" y="87.2">File Input</tspan>
+</text>
+<rect x="45.0" y="164.2" width="132.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="111.0" y="191.2">API Input</tspan>
+</text>
+<rect x="33.0" y="268.2" width="156.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="111.0" y="295.2">Stream Input</tspan>
+</text>
+<rect x="845.0" y="112.2" width="124.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="907.0" y="139.2">Database</tspan>
+</text>
+<rect x="857.0" y="216.2" width="100.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="907.0" y="243.2">Cache</tspan>
+</text>
+<rect x="289.0" y="164.2" width="100.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="339.0" y="191.2">Parse</tspan>
+</text>
+<rect x="439.0" y="164.2" width="124.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="501.0" y="191.2">Validate</tspan>
+</text>
+<rect x="613.0" y="164.2" width="132.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="679.0" y="191.2">Transform</tspan>
+</text>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="111.0" y="40.2">Input</tspan>
+</text>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="517.0" y="144.2">Transform</tspan>
+</text>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="907.0" y="92.2">Output</tspan>
+</text>
+</svg>
+

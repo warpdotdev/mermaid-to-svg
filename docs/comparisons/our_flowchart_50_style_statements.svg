@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="282" height="578" viewBox="0 0 282 578" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M145.0,62.0L145.0,108.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M145.0,166.0L145.0,212.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M118.7,307.7L109.9,318.6C101.1,329.4 83.6,351.2 74.8,367.9C66.0,384.7 66.0,396.3 66.0,402.2L66.0,408.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M171.3,307.7L180.1,318.6C188.9,329.4 206.4,351.2 215.2,367.9C224.0,384.7 224.0,396.3 224.0,402.2L224.0,408.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M66.0,466.0L66.0,470.2C66.0,474.3 66.0,482.7 71.8,490.6C77.5,498.6 89.1,506.2 94.9,510.0L100.6,513.8" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M224.0,466.0L224.0,470.2C224.0,474.3 224.0,482.7 218.2,490.6C212.5,498.6 200.9,506.2 195.1,510.0L189.4,513.8" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="95.0" y="8.0" width="100.0" height="54.0" rx="0.0" fill="#90EE90" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="145.0" y="35.0">Start</tspan>
+</text>
+<rect x="87.0" y="112.0" width="116.0" height="54.0" rx="0.0" fill="#87CEEB" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="145.0" y="139.0">Process</tspan>
+</text>
+<polygon points="145.0,216.0 204.0,275.0 145.0,334.0 86.0,275.0" fill="#FFD700" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="145.0" y="275.0">Decision</tspan>
+</text>
+<rect x="8.0" y="412.0" width="116.0" height="54.0" rx="0.0" fill="#98FB98" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="66.0" y="439.0">Success</tspan>
+</text>
+<rect x="174.0" y="412.0" width="100.0" height="54.0" rx="0.0" fill="#FF6B6B" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="224.0" y="439.0">Error</tspan>
+</text>
+<rect x="103.0" y="516.0" width="84.0" height="54.0" rx="0.0" fill="#DDA0DD" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="145.0" y="543.0">End</tspan>
+</text>
+<rect x="52.0" y="359.0" width="28.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="66.0" y="373.0">Yes</tspan>
+</text>
+<rect x="214.0" y="359.0" width="20.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="224.0" y="373.0">No</tspan>
+</text>
+</svg>
+

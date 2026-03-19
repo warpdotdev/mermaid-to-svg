@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="574" height="1198" viewBox="0 0 574 1198" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M449.0,62.0L449.0,108.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M449.0,166.0L449.0,212.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M449.0,270.0L449.0,316.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M393.8,438.8L366.5,454.5C339.2,470.2 284.6,501.6 257.3,523.1C230.0,544.7 230.0,556.3 230.0,562.2L230.0,568.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M462.4,480.6L464.0,489.3C465.6,498.0 468.8,515.5 470.4,530.1C472.0,544.7 472.0,556.3 472.0,562.2L472.0,568.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M230.0,626.0L230.0,630.2C230.0,634.3 230.0,642.7 256.2,653.1C282.4,663.4 334.7,675.9 360.9,682.1L387.1,688.3" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M472.0,626.0L472.0,630.2C472.0,634.3 472.0,642.7 470.4,650.4C468.9,658.1 465.7,665.2 464.1,668.8L462.6,672.3" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M391.0,719.4L370.0,725.3C349.0,731.3 307.0,743.1 286.0,752.6C265.0,762.0 265.0,769.0 265.0,772.5L265.0,776.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M244.8,933.8L241.9,943.7C238.9,953.6 232.9,973.3 230.0,989.0C227.0,1004.7 227.0,1016.3 227.0,1022.2L227.0,1028.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M305.7,913.3L317.5,926.5C329.2,939.8 352.6,966.4 371.0,985.8C389.4,1005.1 402.8,1017.2 409.5,1023.3L416.2,1029.3" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M511.8,1032.0L515.0,1030.6C518.2,1029.3 524.6,1026.5 532.8,1019.1C541.0,1011.7 551.0,999.5 556.0,987.6C561.0,975.7 561.0,963.9 561.0,946.2C561.0,928.5 561.0,904.7 561.0,881.0C561.0,857.3 561.0,833.5 561.0,815.8C561.0,798.1 561.0,786.3 552.0,774.4C543.0,762.5 525.0,750.3 514.3,743.3C503.6,736.2 500.2,734.1 498.5,733.1L496.9,732.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M164.2,1086.0L154.5,1090.2C144.8,1094.3 125.4,1102.7 115.7,1110.3C106.0,1118.0 106.0,1125.0 106.0,1128.5L106.0,1132.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M289.8,1086.0L299.5,1090.2C309.2,1094.3 328.6,1102.7 338.3,1110.3C348.0,1118.0 348.0,1125.0 348.0,1128.5L348.0,1132.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="367.0" y="216.0" width="164.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="449.0" y="243.0">Enter Address</tspan>
+</text>
+<rect x="367.0" y="8.0" width="164.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="449.0" y="35.0">Shopping Cart</tspan>
+</text>
+<rect x="387.0" y="112.0" width="124.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="449.0" y="139.0">Checkout</tspan>
+</text>
+<rect x="137.0" y="1032.0" width="180.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="227.0" y="1059.0">Order Confirmed</tspan>
+</text>
+<rect x="8.0" y="1136.0" width="196.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="106.0" y="1163.0">Send Confirmation</tspan>
+</text>
+<rect x="378.0" y="572.0" width="188.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="472.0" y="599.0">Express 1-2 days</tspan>
+</text>
+<rect x="254.0" y="1136.0" width="188.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="348.0" y="1163.0">Update Inventory</tspan>
+</text>
+<rect x="391.0" y="676.0" width="116.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="449.0" y="703.0">Payment</tspan>
+</text>
+<polygon points="265.0,780.0 352.0,867.0 265.0,954.0 178.0,867.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="265.0" y="867.0">Process Payment</tspan>
+</text>
+<rect x="367.0" y="1032.0" width="164.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="449.0" y="1059.0">Retry Payment</tspan>
+</text>
+<polygon points="449.0,320.0 536.0,407.0 449.0,494.0 362.0,407.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="449.0" y="407.0">Select Shipping</tspan>
+</text>
+<rect x="132.0" y="572.0" width="196.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="230.0" y="599.0">Standard 5-7 days</tspan>
+</text>
+<rect x="196.0" y="519.0" width="68.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="230.0" y="533.0">Standard</tspan>
+</text>
+<rect x="442.0" y="519.0" width="60.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="472.0" y="533.0">Express</tspan>
+</text>
+<rect x="197.0" y="979.0" width="60.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="227.0" y="993.0">Success</tspan>
+</text>
+<rect x="350.0" y="979.0" width="52.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="376.0" y="993.0">Failed</tspan>
+</text>
+</svg>
+

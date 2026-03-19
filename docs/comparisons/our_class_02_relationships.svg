@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="classDiagram" viewBox="0 0 502 139" role="graphics-document document" aria-roledescription="class">
+<style>
+svg { font-family: "trebuchet ms", verdana, arial, sans-serif; font-size: 16px; fill: #333333; }
+.classTitle { font-weight: bolder; font-size: 18px; }
+.classMember { font-size: 14px; }
+.classAnnotation { font-size: 14px; }
+</style>
+<defs>
+  <marker id="extensionStart" class="marker extension" refX="18" refY="7" markerWidth="190" markerHeight="240" orient="auto"><path d="M 1,7 L18,13 V 1 Z" fill="transparent" stroke="#333333" stroke-width="1"/></marker>
+  <marker id="extensionEnd" class="marker extension" refX="1" refY="7" markerWidth="20" markerHeight="28" orient="auto"><path d="M 1,1 V 13 L18,7 Z" fill="transparent" stroke="#333333" stroke-width="1"/></marker>
+  <marker id="dependencyEnd" class="marker dependency" refX="13" refY="7" markerWidth="20" markerHeight="28" orient="auto"><path d="M 18,7 L9,13 L14,7 L9,1 Z" fill="#333333" stroke="#333333" stroke-width="1"/></marker>
+  <marker id="dependencyStart" class="marker dependency" refX="6" refY="7" markerWidth="190" markerHeight="240" orient="auto"><path d="M 5,7 L9,13 L1,7 L9,1 Z" fill="#333333" stroke="#333333" stroke-width="1"/></marker>
+  <marker id="compositionStart" class="marker composition" refX="18" refY="7" markerWidth="190" markerHeight="240" orient="auto"><path d="M 18,7 L9,13 L1,7 L9,1 Z" fill="#333333" stroke="#333333" stroke-width="1"/></marker>
+  <marker id="compositionEnd" class="marker composition" refX="1" refY="7" markerWidth="20" markerHeight="28" orient="auto"><path d="M 18,7 L9,13 L1,7 L9,1 Z" fill="#333333" stroke="#333333" stroke-width="1"/></marker>
+  <marker id="aggregationStart" class="marker aggregation" refX="18" refY="7" markerWidth="190" markerHeight="240" orient="auto"><path d="M 18,7 L9,13 L1,7 L9,1 Z" fill="transparent" stroke="#333333" stroke-width="1"/></marker>
+  <marker id="aggregationEnd" class="marker aggregation" refX="1" refY="7" markerWidth="20" markerHeight="28" orient="auto"><path d="M 18,7 L9,13 L1,7 L9,1 Z" fill="transparent" stroke="#333333" stroke-width="1"/></marker>
+  <marker id="lollipopStart" class="marker lollipop" refX="13" refY="7" markerWidth="190" markerHeight="240" orient="auto"><circle cx="7" cy="7" r="6" fill="#ECECFF" stroke="#333333" stroke-width="1"/></marker>
+</defs>
+<g class="node default" id="classId-ApiClient" transform="translate(228,69.5)">
+  <rect x="-58.28571428571429" y="-49.5" width="116.57142857142858" height="99" fill="#ECECFF" stroke="none"/>
+  <rect x="-58.28571428571429" y="-49.5" width="116.57142857142858" height="99" fill="none" stroke="#9370DB" stroke-width="1"/>
+  <text x="0" y="-25.5" text-anchor="middle" dominant-baseline="central" class="classTitle" fill="#333333">ApiClient</text>
+  <line x1="-58.28571428571429" y1="-13.5" x2="58.28571428571429" y2="-13.5" stroke="#9370DB" stroke-width="1"/>
+  <line x1="-58.28571428571429" y1="16.5" x2="58.28571428571429" y2="16.5" stroke="#9370DB" stroke-width="1"/>
+  <text x="-46.28571428571429" y="40.5" text-anchor="start" dominant-baseline="central" class="classMember" fill="#333333">+request()</text>
+</g>
+<g class="node default" id="classId-HttpClient" transform="translate(431,69.5)">
+  <rect x="-63.42857142857143" y="-45" width="126.85714285714286" height="90" fill="#ECECFF" stroke="none"/>
+  <rect x="-63.42857142857143" y="-45" width="126.85714285714286" height="90" fill="none" stroke="#9370DB" stroke-width="1"/>
+  <text x="0" y="-21" text-anchor="middle" dominant-baseline="central" class="classTitle" fill="#333333">HttpClient</text>
+  <line x1="-63.42857142857143" y1="-9" x2="63.42857142857143" y2="-9" stroke="#9370DB" stroke-width="1"/>
+  <line x1="-63.42857142857143" y1="21" x2="63.42857142857143" y2="21" stroke="#9370DB" stroke-width="1"/>
+</g>
+<g class="node default" id="classId-IService" transform="translate(64,69.5)">
+  <rect x="-56" y="-61.5" width="112" height="123" fill="#ECECFF" stroke="none"/>
+  <rect x="-56" y="-61.5" width="112" height="123" fill="none" stroke="#9370DB" stroke-width="1"/>
+  <text x="0" y="-37.5" text-anchor="middle" dominant-baseline="central" class="classAnnotation" fill="#333333">«interface»</text>
+  <text x="0" y="-13.5" text-anchor="middle" dominant-baseline="central" class="classTitle" fill="#333333">IService</text>
+  <line x1="-56" y1="-1.5" x2="56" y2="-1.5" stroke="#9370DB" stroke-width="1"/>
+  <line x1="-56" y1="28.5" x2="56" y2="28.5" stroke="#9370DB" stroke-width="1"/>
+  <text x="-44" y="52.5" text-anchor="start" dominant-baseline="central" class="classMember" fill="#333333">+request()</text>
+</g>
+<path d="M137.0,69.5L145.0,69.5L169.7,69.5" class="relation" stroke="#333333" stroke-width="1" fill="none" stroke-dasharray="3" marker-start="url(#extensionStart)"/>
+<path d="M286.3,69.5L327.0,69.5L361.6,69.5" class="relation" stroke="#333333" stroke-width="1" fill="none" marker-end="url(#dependencyEnd)"/>
+<rect x="307" y="57.5" width="40" height="24" fill="#ECECFF" stroke="none" opacity="0.75"/>
+<text x="327" y="69.5" text-anchor="middle" dominant-baseline="central" fill="#333333">uses</text>
+</svg>
+

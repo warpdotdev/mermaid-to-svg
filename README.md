@@ -68,6 +68,10 @@ cargo run --bin render_mermaid -- diagram.mmd > output.svg
 echo 'graph TD; A-->B' | cargo run --bin render_mermaid > output.svg
 ```
 
+## Visual Comparison
+
+See [docs/visual-comparison.md](docs/visual-comparison.md) for a side-by-side comparison of our rendering output against the canonical mermaid-cli across 80 sample diagrams.
+
 ## Testing
 
 ### Unit Tests

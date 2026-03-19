@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="447" height="1356" viewBox="0 0 447 1356" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M174.0,76.0L174.0,122.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M139.2,180.0L133.8,184.2C128.5,188.3 117.7,196.7 112.4,204.3C107.0,212.0 107.0,219.0 107.0,222.5L107.0,226.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M107.0,428.0L107.0,550.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M62.4,554.0L58.2,551.4C53.9,548.9 45.5,543.8 31.4,533.9C17.3,524.1 -2.3,509.5 -12.2,495.2C-22.0,480.8 -22.0,466.7 -22.0,445.4C-22.0,424.1 -22.0,395.5 -22.0,367.0C-22.0,338.5 -22.0,309.9 -22.0,288.6C-22.0,267.3 -22.0,253.2 -1.0,238.8C20.0,224.5 62.0,209.9 86.7,200.4C111.3,190.9 118.6,186.5 122.3,184.3L126.0,182.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M164.6,370.4L187.0,386.5C209.4,402.6 254.2,434.8 276.8,457.1C299.3,479.3 299.6,491.6 299.8,497.8L300.0,503.9" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M301.3,655.3L299.7,730.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M342.9,615.1L358.9,628.4C375.0,641.7 407.0,668.4 423.0,692.7C439.0,717.0 439.0,739.0 439.0,761.0C439.0,783.0 439.0,805.0 439.0,834.3C439.0,863.7 439.0,900.3 439.0,937.0C439.0,973.7 439.0,1010.3 426.1,1034.9C413.2,1059.4 387.4,1071.8 374.5,1078.1L361.6,1084.3" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M299.0,788.0L299.0,862.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M299.7,1007.3L301.3,1082.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M356.0,923.0L358.3,922.4C360.7,921.9 365.3,920.7 374.5,917.2C383.7,913.6 397.3,907.6 404.2,901.7C411.0,895.8 411.0,890.0 411.0,881.2C411.0,872.5 411.0,860.7 411.0,849.0C411.0,837.3 411.0,825.5 411.0,816.8C411.0,808.0 411.0,802.2 406.0,796.3C401.0,790.4 391.0,784.4 386.0,781.4C381.0,778.4 381.0,778.4 381.0,778.4L381.0,778.4" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M302.0,1140.0L302.0,1186.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M302.0,1244.0L302.0,1290.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="216.0" y="1086.0" width="172.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="302.0" y="1113.0">Create Session</tspan>
+</text>
+<rect x="37.0" y="554.0" width="140.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="107.0" y="581.0">Show Error</tspan>
+</text>
+<rect x="104.0" y="126.0" width="140.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="174.0" y="153.0">Login Page</tspan>
+</text>
+<polygon points="302.0,506.0 377.0,581.0 302.0,656.0 227.0,581.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="302.0" y="581.0">MFA Enabled?</tspan>
+</text>
+<rect x="212.0" y="1294.0" width="180.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="302.0" y="1321.0">Redirect to App</tspan>
+</text>
+<rect x="217.0" y="734.0" width="164.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="299.0" y="761.0">Send MFA Code</tspan>
+</text>
+<rect x="220.0" y="1190.0" width="164.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="302.0" y="1217.0">Set JWT Token</tspan>
+</text>
+<rect x="128.0" y="22.0" width="92.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="174.0" y="49.0">User</tspan>
+</text>
+<polygon points="107.0,230.0 206.0,329.0 107.0,428.0 8.0,329.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="107.0" y="329.0">Valid Credentials?</tspan>
+</text>
+<polygon points="299.0,866.0 370.0,937.0 299.0,1008.0 228.0,937.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="299.0" y="937.0">Verify Code</tspan>
+</text>
+<rect x="94.0" y="453.0" width="20.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="104.0" y="467.0">No</tspan>
+</text>
+<rect x="285.0" y="453.0" width="28.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="299.0" y="467.0">Yes</tspan>
+</text>
+<rect x="285.0" y="681.0" width="28.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="299.0" y="695.0">Yes</tspan>
+</text>
+<rect x="429.0" y="808.1" width="20.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="439.0" y="822.1">No</tspan>
+</text>
+<rect x="277.0" y="1033.0" width="44.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="299.0" y="1047.0">Valid</tspan>
+</text>
+<rect x="381.0" y="852.1" width="60.0" height="28.0" fill="rgba(232,232,232,0.8)" rx="2"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="411.0" y="866.1">Invalid</tspan>
+</text>
+</svg>
+

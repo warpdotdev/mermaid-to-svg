@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="773" height="517" viewBox="0 0 773 517" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff;">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+  <marker id="arrowhead-thick" markerWidth="11" markerHeight="11" refX="5" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333333" stroke="#333333" stroke-width="1"/>
+  </marker>
+</defs>
+<path d="M298.0,62.0L298.0,108.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M224.0,156.3L199.3,162.1C174.7,167.9 125.3,179.4 100.7,193.9C76.0,208.3 76.0,225.7 76.0,243.0C76.0,260.3 76.0,277.7 76.8,291.0C77.6,304.4 79.2,313.7 80.0,318.4L80.8,323.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M316.3,166.0L319.1,170.2C322.0,174.3 327.6,182.7 330.4,190.3C333.2,198.0 333.2,205.0 333.2,208.5L333.2,212.0" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M372.0,149.2L422.5,156.2C473.0,163.1 574.0,177.1 624.5,192.7C675.0,208.3 675.0,225.7 675.0,243.0C675.0,260.3 675.0,277.7 650.3,292.4C625.6,307.0 576.3,319.1 551.6,325.1L526.9,331.1" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M86.0,381.0L86.0,436.4" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M266.7,270.0L256.4,274.2C246.1,278.3 225.6,286.7 218.3,294.5C211.0,302.3 217.0,309.6 220.0,313.2L223.0,316.9" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M433.0,381.0L433.0,433.8" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M313.3,270.0L310.2,274.2C307.1,278.3 300.9,286.7 276.7,296.8C252.4,307.0 210.1,318.9 189.0,324.9L167.8,330.9" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3" marker-end="url(#arrowhead)"/>
+<path d="M359.9,270.0L364.0,274.2C368.1,278.3 376.3,286.7 384.4,295.7C392.4,304.6 400.3,314.3 404.3,319.1L408.3,323.9" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3" marker-end="url(#arrowhead)"/>
+<path d="M415.2,258.6L447.1,264.7C479.0,270.7 542.8,282.9 578.6,293.8C614.4,304.6 622.3,314.3 626.3,319.1L630.3,323.9" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<path d="M655.0,381.0L655.0,442.5" fill="none" stroke="#333333" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/>
+<rect x="228.0" y="8.0" width="140.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="298.0" y="35.0">Client App</tspan>
+</text>
+<rect x="224.0" y="112.0" width="148.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="298.0" y="139.0">API Gateway</tspan>
+</text>
+<rect x="545.0" y="446.5" width="220.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="655.0" y="473.5">Notification Service</tspan>
+</text>
+<path d="M 214.0 329.9 L 214.0 378.1 A 39.5 9.9 0 0 0 293.0 378.1 L 293.0 329.9 A 39.5 9.9 0 0 0 214.0 329.9 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="253.5" cy="329.9" rx="39.5" ry="9.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="253.5" y="354.0">Order DB</tspan>
+</text>
+<rect x="251.2" y="216.0" width="164.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="333.2" y="243.0">Order Service</tspan>
+</text>
+<path d="M 385.5 449.7 L 385.5 497.3 A 47.5 11.9 0 0 0 480.5 497.3 L 480.5 449.7 A 47.5 11.9 0 0 0 385.5 449.7 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="433.0" cy="449.7" rx="47.5" ry="11.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="433.0" y="473.5">Product DB</tspan>
+</text>
+<rect x="343.0" y="327.0" width="180.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="433.0" y="354.0">Product Service</tspan>
+</text>
+<rect x="573.0" y="327.0" width="164.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="655.0" y="354.0">Message Queue</tspan>
+</text>
+<path d="M 50.5 449.3 L 50.5 497.7 A 35.5 8.9 0 0 0 121.5 497.7 L 121.5 449.3 A 35.5 8.9 0 0 0 50.5 449.3 Z" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<ellipse cx="86.0" cy="449.3" rx="35.5" ry="8.9" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="86.0" y="473.5">User DB</tspan>
+</text>
+<rect x="8.0" y="327.0" width="156.0" height="54.0" rx="0.0" fill="#ECECFF" stroke="#9370DB" stroke-width="1"/>
+<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="16" fill="#333333">
+<tspan x="86.0" y="354.0">User Service</tspan>
+</text>
+</svg>
+
