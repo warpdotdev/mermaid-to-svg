@@ -324,9 +324,9 @@ fn bbox_from_points_attr(points: &str) -> Option<(f64, f64, f64, f64)> {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum PathCmd {
-    MoveTo,
-    LineTo,
-    CubicTo,
+    Move,
+    Line,
+    Cubic,
 }
 
 fn sample_path_d(d: &str, samples_per_cubic: usize) -> Result<Vec<(f64, f64)>> {
@@ -340,15 +340,15 @@ fn sample_path_d(d: &str, samples_per_cubic: usize) -> Result<Vec<(f64, f64)>> {
 
     for cmd in cmds {
         match cmd {
-            ParsedCmd::MoveTo(p) => {
+            ParsedCmd::Move(p) => {
                 current = p;
                 out.push(p);
             }
-            ParsedCmd::LineTo(p) => {
+            ParsedCmd::Line(p) => {
                 out.push(p);
                 current = p;
             }
-            ParsedCmd::CubicTo { c1, c2, p } => {
+            ParsedCmd::Cubic { c1, c2, p } => {
                 let n = samples_per_cubic.max(2);
                 for i in 1..n {
                     let t = i as f64 / (n as f64 - 1.0);
@@ -388,9 +388,9 @@ enum Token {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum ParsedCmd {
-    MoveTo((f64, f64)),
-    LineTo((f64, f64)),
-    CubicTo {
+    Move((f64, f64)),
+    Line((f64, f64)),
+    Cubic {
         c1: (f64, f64),
         c2: (f64, f64),
         p: (f64, f64),
@@ -409,22 +409,22 @@ fn tokenize_path_d(d: &str) -> Result<Vec<ParsedCmd>> {
         i += 1;
 
         match cmd {
-            PathCmd::MoveTo => {
+            PathCmd::Move => {
                 let (x, y, next) = read_pair(&tokens, i)?;
                 i = next;
-                out.push(ParsedCmd::MoveTo((x, y)));
+                out.push(ParsedCmd::Move((x, y)));
             }
-            PathCmd::LineTo => {
+            PathCmd::Line => {
                 let (x, y, next) = read_pair(&tokens, i)?;
                 i = next;
-                out.push(ParsedCmd::LineTo((x, y)));
+                out.push(ParsedCmd::Line((x, y)));
             }
-            PathCmd::CubicTo => {
+            PathCmd::Cubic => {
                 let (x1, y1, next1) = read_pair(&tokens, i)?;
                 let (x2, y2, next2) = read_pair(&tokens, next1)?;
                 let (x, y, next3) = read_pair(&tokens, next2)?;
                 i = next3;
-                out.push(ParsedCmd::CubicTo {
+                out.push(ParsedCmd::Cubic {
                     c1: (x1, y1),
                     c2: (x2, y2),
                     p: (x, y),
@@ -463,15 +463,15 @@ fn lex_path_d(d: &str) -> Result<Vec<Token>> {
         let c = bytes[i] as char;
         match c {
             'M' => {
-                tokens.push(Token::Cmd(PathCmd::MoveTo));
+                tokens.push(Token::Cmd(PathCmd::Move));
                 i += 1;
             }
             'L' => {
-                tokens.push(Token::Cmd(PathCmd::LineTo));
+                tokens.push(Token::Cmd(PathCmd::Line));
                 i += 1;
             }
             'C' => {
-                tokens.push(Token::Cmd(PathCmd::CubicTo));
+                tokens.push(Token::Cmd(PathCmd::Cubic));
                 i += 1;
             }
             ',' | ' ' | '\n' | '\t' | '\r' => {
