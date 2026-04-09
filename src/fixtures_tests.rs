@@ -2,8 +2,7 @@ use std::path::PathBuf;
 
 #[test]
 fn all_mermaid_fixtures_have_reference_svg() {
-    let samples_root =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("samples");
+    let samples_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("samples");
 
     let mut missing: Vec<String> = Vec::new();
 
