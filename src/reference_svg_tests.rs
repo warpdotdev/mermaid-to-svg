@@ -1282,8 +1282,8 @@ fn debug_print_parity(actual: &SvgGeometry, reference: &SvgGeometry) {
         println!("cluster {cid}: dx={dx:.2} dy={dy:.2} dw={dw:.2} dh={dh:.2}");
     }
 
-    let actual_edges = group_edges_by_pair(&actual);
-    let reference_edges = group_edges_by_pair(&reference);
+    let actual_edges = group_edges_by_pair(actual);
+    let reference_edges = group_edges_by_pair(reference);
 
     for (key, ref_list) in reference_edges {
         let Some(act_list) = actual_edges.get(&key) else {

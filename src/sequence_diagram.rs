@@ -45,8 +45,8 @@ pub fn render_sequence_diagram_to_svg(
     let height = (footer_y + footer_h + header_y).max(220.0);
 
     let mut x_for: BTreeMap<&str, f64> = BTreeMap::new();
-    for (idx, p) in diagram.participants.iter().enumerate() {
-        x_for.insert(p.id.as_str(), left_margin + idx as f64 * spacing);
+    for (idx, participant) in diagram.participants.iter().enumerate() {
+        x_for.insert(participant.id.as_str(), left_margin + idx as f64 * spacing);
     }
 
     let mut svg = String::new();
@@ -64,8 +64,11 @@ pub fn render_sequence_diagram_to_svg(
     );
 
     // Draw top participant boxes, lifelines, and bottom participant boxes
-    for p in &diagram.participants {
-        let x = x_for.get(p.id.as_str()).copied().unwrap_or(left_margin);
+    for participant in &diagram.participants {
+        let x = x_for
+            .get(participant.id.as_str())
+            .copied()
+            .unwrap_or(left_margin);
         let box_x = x - box_w / 2.0;
 
         // Top participant box
@@ -76,7 +79,7 @@ pub fn render_sequence_diagram_to_svg(
         svg.push_str(&render_participant_label(
             x,
             header_y + header_h / 2.0,
-            &p.label,
+            &participant.label,
             &theme.text_color,
         ));
 
@@ -97,7 +100,7 @@ pub fn render_sequence_diagram_to_svg(
         svg.push_str(&render_participant_label(
             x,
             footer_y + footer_h / 2.0,
-            &p.label,
+            &participant.label,
             &theme.text_color,
         ));
     }
@@ -191,12 +194,21 @@ stroke=\"{}\" stroke-width=\"1.5\" fill=\"none\"{dash} marker-end=\"url(#seq_arr
 struct SequenceParticipant {
     id: String,
     label: String,
+    aliases: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
 struct SequenceDiagram {
     participants: Vec<SequenceParticipant>,
     events: Vec<SequenceEvent>,
+}
+
+impl SequenceParticipant {
+    fn matches(&self, reference: &str) -> bool {
+        self.id == reference
+            || self.label == reference
+            || self.aliases.iter().any(|alias| alias == reference)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -250,22 +262,8 @@ fn parse_sequence_diagram(input: &str) -> Result<SequenceDiagram, MermaidError> 
         }
 
         if let Some(rest) = line.strip_prefix("participant ") {
-            let rest = rest.trim();
-            if rest.is_empty() {
-                return Err(MermaidError::ParseError {
-                    line: line_no,
-                    message: "Expected participant name".to_string(),
-                });
-            }
-            let (id, label) = match rest.split_once(" as ") {
-                Some((id_part, label_part)) => {
-                    (id_part.trim().to_string(), label_part.trim().to_string())
-                }
-                None => (rest.to_string(), rest.to_string()),
-            };
-            if !participants.iter().any(|p| p.id == id) {
-                participants.push(SequenceParticipant { id, label });
-            }
+            let participant = parse_participant_declaration(rest, line_no)?;
+            register_participant(&mut participants, participant);
             continue;
         }
 
@@ -280,12 +278,15 @@ fn parse_sequence_diagram(input: &str) -> Result<SequenceDiagram, MermaidError> 
             let who = who.trim();
             let text = text.trim();
             let (from, to) = match who.split_once(',') {
-                Some((a, b)) => (a.trim().to_string(), b.trim().to_string()),
-                None => (who.to_string(), who.to_string()),
+                Some((a, b)) => (
+                    resolve_participant_ref(&mut participants, a.trim()),
+                    resolve_participant_ref(&mut participants, b.trim()),
+                ),
+                None => {
+                    let participant = resolve_participant_ref(&mut participants, who);
+                    (participant.clone(), participant)
+                }
             };
-
-            add_participant(&mut participants, &from);
-            add_participant(&mut participants, &to);
 
             events.push(SequenceEvent::NoteOver {
                 from,
@@ -296,10 +297,8 @@ fn parse_sequence_diagram(input: &str) -> Result<SequenceDiagram, MermaidError> 
         }
 
         if let Some(msg) = parse_message_line(line) {
-            let from = msg.from.clone();
-            let to = msg.to.clone();
-            add_participant(&mut participants, &from);
-            add_participant(&mut participants, &to);
+            let from = resolve_participant_ref(&mut participants, &msg.from);
+            let to = resolve_participant_ref(&mut participants, &msg.to);
 
             events.push(SequenceEvent::Message {
                 from,
@@ -312,7 +311,7 @@ fn parse_sequence_diagram(input: &str) -> Result<SequenceDiagram, MermaidError> 
 
         if matches!(
             line.split_whitespace().next(),
-            Some("alt") | Some("else") | Some("opt") | Some("loop") | Some("end")
+            Some("alt") | Some("else") | Some("loop") | Some("opt") | Some("end")
         ) {
             continue;
         }
@@ -327,6 +326,7 @@ fn parse_sequence_diagram(input: &str) -> Result<SequenceDiagram, MermaidError> 
         participants.push(SequenceParticipant {
             id: "Participant".to_string(),
             label: "Participant".to_string(),
+            aliases: Vec::new(),
         });
     }
 
@@ -370,12 +370,118 @@ fn parse_message_line(line: &str) -> Option<ParsedMessage> {
     })
 }
 
-fn add_participant(list: &mut Vec<SequenceParticipant>, id: &str) {
-    if !list.iter().any(|p| p.id == id) {
-        list.push(SequenceParticipant {
-            id: id.to_string(),
-            label: id.to_string(),
+fn parse_participant_declaration(
+    raw: &str,
+    line_no: usize,
+) -> Result<SequenceParticipant, MermaidError> {
+    let raw = raw.trim();
+    if raw.is_empty() {
+        return Err(MermaidError::ParseError {
+            line: line_no,
+            message: "Expected participant name".to_string(),
         });
+    }
+
+    let (id, label, aliases) = match raw.split_once(" as ") {
+        Some((lhs, rhs)) => {
+            let lhs = normalize_participant_token(lhs);
+            let rhs = normalize_participant_token(rhs);
+            if lhs.is_empty() || rhs.is_empty() {
+                return Err(MermaidError::ParseError {
+                    line: line_no,
+                    message: "Expected participant name".to_string(),
+                });
+            }
+            let (id, label) = choose_participant_id_and_label(&lhs, &rhs);
+            let mut aliases = Vec::new();
+            push_unique_alias(&mut aliases, lhs);
+            push_unique_alias(&mut aliases, rhs);
+            (id, label, aliases)
+        }
+        None => {
+            let name = normalize_participant_token(raw);
+            if name.is_empty() {
+                return Err(MermaidError::ParseError {
+                    line: line_no,
+                    message: "Expected participant name".to_string(),
+                });
+            }
+            (name.clone(), name, Vec::new())
+        }
+    };
+
+    Ok(SequenceParticipant { id, label, aliases })
+}
+
+fn choose_participant_id_and_label(lhs: &str, rhs: &str) -> (String, String) {
+    let lhs_has_whitespace = lhs.chars().any(char::is_whitespace);
+    let rhs_has_whitespace = rhs.chars().any(char::is_whitespace);
+
+    match (lhs_has_whitespace, rhs_has_whitespace) {
+        (true, false) => (rhs.to_string(), lhs.to_string()),
+        (false, true) => (lhs.to_string(), rhs.to_string()),
+        _ if lhs.len() <= rhs.len() => (lhs.to_string(), rhs.to_string()),
+        _ => (rhs.to_string(), lhs.to_string()),
+    }
+}
+
+fn normalize_participant_token(token: &str) -> String {
+    token
+        .trim()
+        .trim_matches(|ch| matches!(ch, '"' | '\''))
+        .trim()
+        .to_string()
+}
+
+fn register_participant(list: &mut Vec<SequenceParticipant>, participant: SequenceParticipant) {
+    let match_index = list.iter().position(|existing| {
+        existing.matches(&participant.id)
+            || existing.matches(&participant.label)
+            || participant
+                .aliases
+                .iter()
+                .any(|alias| existing.matches(alias))
+    });
+
+    match match_index {
+        Some(index) => {
+            let existing = &mut list[index];
+            if existing.label == existing.id && participant.label != participant.id {
+                existing.label = participant.label.clone();
+            }
+            push_unique_alias(&mut existing.aliases, participant.id.clone());
+            push_unique_alias(&mut existing.aliases, participant.label.clone());
+            for alias in participant.aliases {
+                push_unique_alias(&mut existing.aliases, alias);
+            }
+        }
+        None => list.push(participant),
+    }
+}
+
+fn resolve_participant_ref(list: &mut Vec<SequenceParticipant>, reference: &str) -> String {
+    let reference = normalize_participant_token(reference);
+
+    if let Some(participant) = list
+        .iter()
+        .find(|participant| participant.matches(&reference))
+    {
+        return participant.id.clone();
+    }
+
+    let participant = SequenceParticipant {
+        id: reference.clone(),
+        label: reference,
+        aliases: Vec::new(),
+    };
+    let id = participant.id.clone();
+    list.push(participant);
+    id
+}
+
+fn push_unique_alias(aliases: &mut Vec<String>, value: String) {
+    if !value.is_empty() && !aliases.iter().any(|alias| alias == &value) {
+        aliases.push(value);
     }
 }
 
@@ -437,3 +543,4 @@ fn escape_xml(s: &str) -> String {
         .replace('"', "&quot;")
         .replace('\'', "&apos;")
 }
+

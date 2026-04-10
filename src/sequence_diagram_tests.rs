@@ -60,3 +60,67 @@ fn renders_aliased_participants_without_br_in_svg() {
         "SVG should use tspan elements for multi-line participant labels"
     );
 }
+
+#[test]
+fn parses_sequence_diagram_with_opt_and_aliases() {
+    let diagram = parse_sequence_diagram(
+        r#"sequenceDiagram
+    participant User
+    participant WorkspaceView
+    participant RightPanelView
+    participant WorkingDirectoriesModel as WDModel
+    participant CodeReviewView
+
+    User->>WorkspaceView: toggle panel
+    WorkspaceView->>RightPanelView: open_code_review(repo_path, diff_model, terminal)
+    RightPanelView->>WDModel: get_code_review_view(pane_group_id)
+    opt Old view exists
+        RightPanelView->>CodeReviewView: on_close()
+    end
+    RightPanelView->>RightPanelView: create_code_review_view(repo)
+    RightPanelView->>WDModel: store_code_review_view(pane_group_id, new_view)
+    RightPanelView->>CodeReviewView: on_open(repo)"#,
+    )
+    .expect("sequence diagram should parse");
+
+    assert_eq!(diagram.participants.len(), 5);
+    assert!(diagram
+        .participants
+        .iter()
+        .any(|participant| participant.id == "WDModel"
+            && participant.label == "WorkingDirectoriesModel"));
+
+    let wdmodel_messages = diagram
+        .events
+        .iter()
+        .filter(|event| {
+            matches!(
+                event,
+                SequenceEvent::Message { to, .. } if to == "WDModel"
+            )
+        })
+        .count();
+    assert_eq!(wdmodel_messages, 2);
+}
+
+#[test]
+fn renders_sequence_diagram_with_opt_and_aliases() {
+    let svg = render_sequence_diagram_to_svg(
+        r#"sequenceDiagram
+    participant WorkingDirectoriesModel as WDModel
+    participant RightPanelView
+    participant CodeReviewView
+
+    RightPanelView->>WDModel: get_code_review_view(pane_group_id)
+    opt Old view exists
+        RightPanelView->>CodeReviewView: on_close()
+    end"#,
+        &MermaidTheme::default(),
+    )
+    .expect("sequence diagram should render");
+
+    assert!(svg.contains("<svg"));
+    assert!(svg.contains("WorkingDirectoriesModel"));
+    assert!(svg.contains("get_code_review_view(pane_group_id)"));
+    assert!(!svg.contains(">WDModel<"));
+}
