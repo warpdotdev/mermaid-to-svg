@@ -8,10 +8,7 @@ use graphlib_rust::{Graph, GraphOption};
 use std::collections::{HashMap, HashSet};
 
 fn samples_root() -> String {
-    format!(
-        "{}/samples",
-        env!("CARGO_MANIFEST_DIR")
-    )
+    format!("{}/samples", env!("CARGO_MANIFEST_DIR"))
 }
 
 fn fixture_mermaid_path(case: &FixtureCase) -> String {
@@ -166,10 +163,8 @@ fn edge_routes_match_reference_svg_for_01_basic_flowchart() {
 #[test]
 fn node_centers_match_reference_svg_for_07_horizontal() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path =
-        format!("{base_dir}/samples/flowchart/mermaid/07_horizontal.mmd");
-    let reference_svg_path =
-        format!("{base_dir}/samples/flowchart/reference/07_horizontal.svg");
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/07_horizontal.mmd");
+    let reference_svg_path = format!("{base_dir}/samples/flowchart/reference/07_horizontal.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =
@@ -204,10 +199,8 @@ fn node_centers_match_reference_svg_for_07_horizontal() {
 #[test]
 fn edge_routes_match_reference_svg_for_07_horizontal() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path =
-        format!("{base_dir}/samples/flowchart/mermaid/07_horizontal.mmd");
-    let reference_svg_path =
-        format!("{base_dir}/samples/flowchart/reference/07_horizontal.svg");
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/07_horizontal.mmd");
+    let reference_svg_path = format!("{base_dir}/samples/flowchart/reference/07_horizontal.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =
@@ -245,12 +238,9 @@ fn edge_routes_match_reference_svg_for_07_horizontal() {
 #[ignore]
 fn debug_node_position_deltas_for_01_basic_flowchart() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path = format!(
-        "{base_dir}/samples/flowchart/mermaid/01_basic_flowchart.mmd"
-    );
-    let reference_svg_path = format!(
-        "{base_dir}/samples/flowchart/reference/01_basic_flowchart.svg"
-    );
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/01_basic_flowchart.mmd");
+    let reference_svg_path =
+        format!("{base_dir}/samples/flowchart/reference/01_basic_flowchart.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =
@@ -308,12 +298,9 @@ fn debug_node_position_deltas_for_01_basic_flowchart() {
 #[ignore]
 fn debug_edge_hausdorff_for_01_basic_flowchart() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path = format!(
-        "{base_dir}/samples/flowchart/mermaid/01_basic_flowchart.mmd"
-    );
-    let reference_svg_path = format!(
-        "{base_dir}/samples/flowchart/reference/01_basic_flowchart.svg"
-    );
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/01_basic_flowchart.mmd");
+    let reference_svg_path =
+        format!("{base_dir}/samples/flowchart/reference/01_basic_flowchart.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =
@@ -357,10 +344,8 @@ fn debug_edge_hausdorff_for_01_basic_flowchart() {
 #[ignore]
 fn debug_parity_for_06_subgraphs() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path =
-        format!("{base_dir}/samples/flowchart/mermaid/06_subgraphs.mmd");
-    let reference_svg_path =
-        format!("{base_dir}/samples/flowchart/reference/06_subgraphs.svg");
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/06_subgraphs.mmd");
+    let reference_svg_path = format!("{base_dir}/samples/flowchart/reference/06_subgraphs.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =
@@ -446,12 +431,9 @@ fn debug_parity_for_06_subgraphs() {
 #[ignore]
 fn debug_parity_for_26_nested_subgraphs() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path = format!(
-        "{base_dir}/samples/flowchart/mermaid/26_nested_subgraphs.mmd"
-    );
-    let reference_svg_path = format!(
-        "{base_dir}/samples/flowchart/reference/26_nested_subgraphs.svg"
-    );
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/26_nested_subgraphs.mmd");
+    let reference_svg_path =
+        format!("{base_dir}/samples/flowchart/reference/26_nested_subgraphs.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =
@@ -471,12 +453,9 @@ fn debug_parity_for_26_nested_subgraphs() {
 #[ignore]
 fn debug_parity_for_26_nested_subgraphs_ported() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path = format!(
-        "{base_dir}/samples/flowchart/mermaid/26_nested_subgraphs.mmd"
-    );
-    let reference_svg_path = format!(
-        "{base_dir}/samples/flowchart/reference/26_nested_subgraphs.svg"
-    );
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/26_nested_subgraphs.mmd");
+    let reference_svg_path =
+        format!("{base_dir}/samples/flowchart/reference/26_nested_subgraphs.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =
@@ -496,9 +475,7 @@ fn debug_parity_for_26_nested_subgraphs_ported() {
 #[ignore]
 fn debug_layout_result_positions_for_26_nested_subgraphs_no_centering() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path = format!(
-        "{base_dir}/samples/flowchart/mermaid/26_nested_subgraphs.mmd"
-    );
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/26_nested_subgraphs.mmd");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let graph = crate::parser::parse_mermaid(&mermaid).expect("mermaid should parse");
@@ -526,9 +503,8 @@ fn debug_layout_result_positions_for_26_nested_subgraphs_no_centering() {
 #[ignore]
 fn debug_reference_svg_positions_for_26_nested_subgraphs() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let reference_svg_path = format!(
-        "{base_dir}/samples/flowchart/reference/26_nested_subgraphs.svg"
-    );
+    let reference_svg_path =
+        format!("{base_dir}/samples/flowchart/reference/26_nested_subgraphs.svg");
 
     let reference_svg =
         std::fs::read_to_string(reference_svg_path).expect("reference svg should be readable");
@@ -561,12 +537,9 @@ fn debug_reference_svg_positions_for_26_nested_subgraphs() {
 #[ignore]
 fn debug_parity_for_26_nested_subgraphs_with_centering() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path = format!(
-        "{base_dir}/samples/flowchart/mermaid/26_nested_subgraphs.mmd"
-    );
-    let reference_svg_path = format!(
-        "{base_dir}/samples/flowchart/reference/26_nested_subgraphs.svg"
-    );
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/26_nested_subgraphs.mmd");
+    let reference_svg_path =
+        format!("{base_dir}/samples/flowchart/reference/26_nested_subgraphs.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =
@@ -832,12 +805,9 @@ fn debug_parity_summary_for_all_samples_ported() {
 #[ignore]
 fn debug_parity_for_49_dense_connections() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path = format!(
-        "{base_dir}/samples/flowchart/mermaid/49_dense_connections.mmd"
-    );
-    let reference_svg_path = format!(
-        "{base_dir}/samples/flowchart/reference/49_dense_connections.svg"
-    );
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/49_dense_connections.mmd");
+    let reference_svg_path =
+        format!("{base_dir}/samples/flowchart/reference/49_dense_connections.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =
@@ -857,9 +827,8 @@ fn debug_parity_for_49_dense_connections() {
 #[ignore]
 fn debug_dagre_direct_positions_for_49_dense_connections() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let reference_svg_path = format!(
-        "{base_dir}/samples/flowchart/reference/49_dense_connections.svg"
-    );
+    let reference_svg_path =
+        format!("{base_dir}/samples/flowchart/reference/49_dense_connections.svg");
 
     let reference_svg =
         std::fs::read_to_string(reference_svg_path).expect("reference svg should be readable");
@@ -957,9 +926,8 @@ fn debug_dagre_direct_positions_for_49_dense_connections() {
 #[ignore]
 fn debug_dagre_layering_for_49_dense_connections() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let reference_svg_path = format!(
-        "{base_dir}/samples/flowchart/reference/49_dense_connections.svg"
-    );
+    let reference_svg_path =
+        format!("{base_dir}/samples/flowchart/reference/49_dense_connections.svg");
 
     let reference_svg =
         std::fs::read_to_string(reference_svg_path).expect("reference svg should be readable");
@@ -1340,10 +1308,8 @@ fn debug_print_parity(actual: &SvgGeometry, reference: &SvgGeometry) {
 #[ignore]
 fn debug_parity_for_07_horizontal() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path =
-        format!("{base_dir}/samples/flowchart/mermaid/07_horizontal.mmd");
-    let reference_svg_path =
-        format!("{base_dir}/samples/flowchart/reference/07_horizontal.svg");
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/07_horizontal.mmd");
+    let reference_svg_path = format!("{base_dir}/samples/flowchart/reference/07_horizontal.svg");
 
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
     let reference_svg =

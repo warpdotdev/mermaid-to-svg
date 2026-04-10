@@ -7,9 +7,7 @@ use super::get_data;
 #[test]
 fn flow_data_matches_expected_for_01_basic_flowchart() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path = format!(
-        "{base_dir}/samples/flowchart/mermaid/01_basic_flowchart.mmd"
-    );
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/01_basic_flowchart.mmd");
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
 
     let graph = flow_parser::parse_flowchart(&mermaid).expect("mermaid should parse");
@@ -68,8 +66,7 @@ fn flow_data_matches_expected_for_01_basic_flowchart() {
 #[test]
 fn flow_data_tracks_subgraphs_for_06_subgraphs() {
     let base_dir = env!("CARGO_MANIFEST_DIR");
-    let mermaid_path =
-        format!("{base_dir}/samples/flowchart/mermaid/06_subgraphs.mmd");
+    let mermaid_path = format!("{base_dir}/samples/flowchart/mermaid/06_subgraphs.mmd");
     let mermaid = std::fs::read_to_string(mermaid_path).expect("mermaid source should be readable");
 
     let graph = flow_parser::parse_flowchart(&mermaid).expect("mermaid should parse");
