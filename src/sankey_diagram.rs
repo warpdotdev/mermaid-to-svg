@@ -82,13 +82,13 @@ pub fn render_sankey_diagram_to_svg(
             let x = node.x - LABEL_OFFSET;
             svg.push_str(&format!(
                 "<text x=\"{x}\" y=\"{center_y}\" dy=\"0em\" text-anchor=\"end\">{}</text>",
-                escape_xml(&node.name)
+                escape_xml(&node.display_label)
             ));
         } else {
             let x = node.x + NODE_WIDTH + LABEL_OFFSET;
             svg.push_str(&format!(
                 "<text x=\"{x}\" y=\"{center_y}\" dy=\"0em\" text-anchor=\"start\">{}</text>",
-                escape_xml(&node.name)
+                escape_xml(&node.display_label)
             ));
         }
     }
@@ -135,6 +135,7 @@ struct SankeyLink {
 #[derive(Debug, Clone)]
 struct SankeyNodeLayout {
     name: String,
+    display_label: String,
     dom_id: String,
     depth: usize,
     x: f64,
@@ -343,6 +344,7 @@ fn compute_layout(diagram: &SankeyDiagram) -> SankeyLayout {
                 name,
                 SankeyNodeLayout {
                     name: name.to_string(),
+                    display_label: format_sankey_node_label(name, v),
                     dom_id,
                     depth: *d,
                     x,
@@ -423,4 +425,12 @@ fn escape_xml(s: &str) -> String {
         .replace('>', "&gt;")
         .replace('"', "&quot;")
         .replace('\'', "&#39;")
+}
+
+fn format_sankey_node_label(name: &str, value: f64) -> String {
+    if value.fract().abs() < f64::EPSILON {
+        format!("{name} {}", value as i64)
+    } else {
+        format!("{name} {value}")
+    }
 }

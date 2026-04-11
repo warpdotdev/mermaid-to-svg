@@ -219,20 +219,35 @@ impl<'a> LayoutEngine<'a> {
                 };
                 self.clip_edge_to_boundaries(&mut points, from_node, to_node);
 
-                // For back edges, dagre's label position is stale because we
-                // recompute the edge points.  Fall back to the midpoint of the
-                // actual routed path so the label appears on the edge.
-                let label_pos = if is_back_edge {
-                    None
-                } else {
-                    e.label.as_ref().and_then(|label| {
-                        if label.trim().is_empty() {
-                            None
-                        } else {
-                            edge_label_positions.get(&idx).copied()
-                        }
-                    })
-                };
+                let label_pos = e.label.as_ref().and_then(|label| {
+                    if label.trim().is_empty() {
+                        None
+                    } else if is_back_edge {
+                        Some(Self::edge_label_midpoint(&points))
+                    } else {
+                        let midpoint = Self::edge_label_midpoint(&points);
+                        edge_label_positions
+                            .get(&idx)
+                            .copied()
+                            .filter(|(x, y)| {
+                                let mut min_x = f64::INFINITY;
+                                let mut max_x = f64::NEG_INFINITY;
+                                let mut min_y = f64::INFINITY;
+                                let mut max_y = f64::NEG_INFINITY;
+                                for &(px, py) in &points {
+                                    min_x = min_x.min(px);
+                                    max_x = max_x.max(px);
+                                    min_y = min_y.min(py);
+                                    max_y = max_y.max(py);
+                                }
+                                *x >= min_x - 8.0
+                                    && *x <= max_x + 8.0
+                                    && *y >= min_y - 8.0
+                                    && *y <= max_y + 8.0
+                            })
+                            .or(Some(midpoint))
+                    }
+                });
 
                 Some(LayoutEdge {
                     from: e.from.clone(),
@@ -259,6 +274,12 @@ impl<'a> LayoutEngine<'a> {
         for node in layout_nodes.values() {
             min_x = min_x.min(node.x - node.width / 2.0);
             min_y = min_y.min(node.y - node.height / 2.0);
+        }
+        for edge in &layout_edges {
+            if let Some((label_x, label_y, label_w, label_h)) = self.edge_label_bounds(edge) {
+                min_x = min_x.min(label_x - label_w / 2.0);
+                min_y = min_y.min(label_y - label_h / 2.0);
+            }
         }
         let x_shift = if min_x < MARGIN { MARGIN - min_x } else { 0.0 };
         let y_shift = if min_y < MARGIN { MARGIN - min_y } else { 0.0 };
@@ -302,6 +323,10 @@ impl<'a> LayoutEngine<'a> {
             for &(px, py) in &edge.points {
                 final_width = final_width.max(px + MARGIN);
                 final_height = final_height.max(py + MARGIN);
+            }
+            if let Some((label_x, label_y, label_w, label_h)) = self.edge_label_bounds(edge) {
+                final_width = final_width.max(label_x + label_w / 2.0 + MARGIN);
+                final_height = final_height.max(label_y + label_h / 2.0 + MARGIN);
             }
         }
         LayoutResult {
@@ -954,6 +979,9 @@ impl<'a> LayoutEngine<'a> {
                 let diameter = text_width + padding;
                 (diameter, diameter)
             }
+            NodeShape::StartState => (14.0, 14.0),
+            NodeShape::EndState => (20.0, 20.0),
+            NodeShape::ForkJoin => (70.0, 10.0),
             NodeShape::Stadium => {
                 let h = text_height + padding;
                 let w = text_width + h / 4.0 + padding;
@@ -2138,6 +2166,60 @@ impl<'a> LayoutEngine<'a> {
         (max_x + MARGIN, max_y + MARGIN)
     }
 
+    fn edge_label_bounds(&self, edge: &LayoutEdge) -> Option<(f64, f64, f64, f64)> {
+        let label = edge.label.as_ref()?;
+        let (width, height) = self.edge_label_dimensions(label)?;
+        let (x, y) = edge
+            .label_pos
+            .unwrap_or_else(|| Self::edge_label_midpoint(&edge.points));
+        Some((x, y, width, height))
+    }
+
+    fn edge_label_midpoint(points: &[(f64, f64)]) -> (f64, f64) {
+        if points.len() < 2 {
+            return points.first().copied().unwrap_or((0.0, 0.0));
+        }
+
+        let mut segment_lengths = Vec::with_capacity(points.len() - 1);
+        let mut total_length = 0.0;
+
+        for i in 0..points.len() - 1 {
+            let dx = points[i + 1].0 - points[i].0;
+            let dy = points[i + 1].1 - points[i].1;
+            let len = (dx * dx + dy * dy).sqrt();
+            segment_lengths.push(len);
+            total_length += len;
+        }
+
+        if total_length < 0.001 {
+            return points[0];
+        }
+
+        let target_distance = total_length * 0.5;
+        let mut accumulated = 0.0;
+
+        for (i, &seg_len) in segment_lengths.iter().enumerate() {
+            if accumulated + seg_len >= target_distance {
+                let remaining = target_distance - accumulated;
+                let t = if seg_len > 0.001 {
+                    remaining / seg_len
+                } else {
+                    0.0
+                };
+                let x = points[i].0 + t * (points[i + 1].0 - points[i].0);
+                let y = points[i].1 + t * (points[i + 1].1 - points[i].1);
+                return (x, y);
+            }
+            accumulated += seg_len;
+        }
+
+        let last = points.len() - 1;
+        (
+            (points[0].0 + points[last].0) / 2.0,
+            (points[0].1 + points[last].1) / 2.0,
+        )
+    }
+
     fn is_back_edge(&self, from: &LayoutNode, to: &LayoutNode) -> bool {
         let dx = to.x - from.x;
         let dy = to.y - from.y;
@@ -2626,7 +2708,7 @@ impl<'a> LayoutEngine<'a> {
         let dy = node.y - from_y;
 
         match node.shape {
-            NodeShape::Circle => {
+            NodeShape::Circle | NodeShape::StartState | NodeShape::EndState => {
                 let r = node.width.min(node.height) / 2.0;
                 let len = (dx * dx + dy * dy).sqrt();
                 if len == 0.0 {
@@ -2669,7 +2751,7 @@ impl<'a> LayoutEngine<'a> {
         let dy = target_y - node.y;
 
         match node.shape {
-            NodeShape::Circle => {
+            NodeShape::Circle | NodeShape::StartState | NodeShape::EndState => {
                 let r = node.width.min(node.height) / 2.0;
                 let len = (dx * dx + dy * dy).sqrt();
                 if len == 0.0 {

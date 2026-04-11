@@ -139,6 +139,9 @@ impl<'a> SvgRenderer<'a> {
             NodeShape::Stadium => self.render_rectangle(node, node.height / 2.0),
             NodeShape::Diamond => self.render_diamond(node),
             NodeShape::Circle => self.render_circle(node),
+            NodeShape::StartState => self.render_start_state(node),
+            NodeShape::EndState => self.render_end_state(node),
+            NodeShape::ForkJoin => self.render_fork_join(node),
             NodeShape::Hexagon => self.render_hexagon(node),
             NodeShape::Cylinder => self.render_cylinder(node),
             NodeShape::Subroutine => self.render_subroutine(node),
@@ -162,6 +165,40 @@ impl<'a> SvgRenderer<'a> {
         ));
 
         self.render_text(node.x, node.y, &node.label);
+    }
+
+    fn render_start_state(&mut self, node: &LayoutNode) {
+        let r = node.width.min(node.height) / 2.0;
+        self.output.push_str(&format!(
+            r#"<circle cx="{:.1}" cy="{:.1}" r="{:.1}" fill="{}" stroke="{}" stroke-width="1"/>
+"#,
+            node.x, node.y, r, self.theme.edge_color, self.theme.edge_color
+        ));
+    }
+
+    fn render_end_state(&mut self, node: &LayoutNode) {
+        let outer_r = node.width.min(node.height) / 2.0;
+        let inner_r = (outer_r - 4.0).max(outer_r * 0.55);
+        self.output.push_str(&format!(
+            r#"<circle cx="{:.1}" cy="{:.1}" r="{:.1}" fill="{}" stroke="{}" stroke-width="1"/>
+"#,
+            node.x, node.y, outer_r, self.theme.background, self.theme.edge_color
+        ));
+        self.output.push_str(&format!(
+            r#"<circle cx="{:.1}" cy="{:.1}" r="{:.1}" fill="{}" stroke="{}" stroke-width="1"/>
+"#,
+            node.x, node.y, inner_r, self.theme.edge_color, self.theme.edge_color
+        ));
+    }
+
+    fn render_fork_join(&mut self, node: &LayoutNode) {
+        let x = node.x - node.width / 2.0;
+        let y = node.y - node.height / 2.0;
+        self.output.push_str(&format!(
+            r#"<rect x="{:.1}" y="{:.1}" width="{:.1}" height="{:.1}" rx="1" fill="{}" stroke="{}" stroke-width="1"/>
+"#,
+            x, y, node.width, node.height, self.theme.edge_color, self.theme.edge_color
+        ));
     }
 
     fn render_diamond(&mut self, node: &LayoutNode) {
