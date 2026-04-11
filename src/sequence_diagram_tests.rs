@@ -1,6 +1,6 @@
 use super::*;
 
-const KEVIN_DIAGRAM: &str = r#"sequenceDiagram
+const ALIASED_PARTICIPANTS_WITH_MULTILINE_LABELS_DIAGRAM: &str = r#"sequenceDiagram
     participant W as File Watcher
     participant L as LocalRepoMetadataModel<br/>(remote server)
     participant N as Network Layer<br/>(future, out of scope)
@@ -19,7 +19,8 @@ const KEVIN_DIAGRAM: &str = r#"sequenceDiagram
 
 #[test]
 fn parses_aliased_participants_correctly() {
-    let diagram = parse_sequence_diagram(KEVIN_DIAGRAM).expect("should parse");
+    let diagram = parse_sequence_diagram(ALIASED_PARTICIPANTS_WITH_MULTILINE_LABELS_DIAGRAM)
+        .expect("should parse");
 
     assert_eq!(
         diagram.participants.len(),
@@ -44,7 +45,11 @@ fn parses_aliased_participants_correctly() {
 fn renders_aliased_participants_without_br_in_svg() {
     let theme = crate::theme::MermaidTheme::default();
     let svg =
-        render_sequence_diagram_to_svg(KEVIN_DIAGRAM, &theme).expect("should render without error");
+        render_sequence_diagram_to_svg(
+            ALIASED_PARTICIPANTS_WITH_MULTILINE_LABELS_DIAGRAM,
+            &theme,
+        )
+        .expect("should render without error");
 
     assert!(!svg.contains("<br/>"), "SVG must not contain literal <br/>");
     assert!(
