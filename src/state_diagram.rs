@@ -1,7 +1,7 @@
 use crate::ast::{Edge, EdgeStyle, FlowchartGraph, GraphDirection, Node, NodeShape, Statement};
 use crate::error::MermaidError;
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 pub fn parse_state_diagram(input: &str) -> Result<FlowchartGraph, MermaidError> {
     let lines: Vec<&str> = input.lines().collect();
@@ -36,7 +36,7 @@ pub fn parse_state_diagram(input: &str) -> Result<FlowchartGraph, MermaidError> 
     }
 
     let mut nodes: BTreeMap<String, NodeShape> = BTreeMap::new();
-    let mut referenced: BTreeSet<String> = BTreeSet::new();
+    let mut node_order: Vec<String> = Vec::new();
     let mut edges: Vec<(String, String, Option<String>)> = Vec::new();
 
     while i < lines.len() {
@@ -62,11 +62,14 @@ pub fn parse_state_diagram(input: &str) -> Result<FlowchartGraph, MermaidError> 
             let shape = if rest.contains("<<choice>>") {
                 NodeShape::Diamond
             } else if rest.contains("<<fork>>") || rest.contains("<<join>>") {
-                NodeShape::Rectangle
+                NodeShape::ForkJoin
             } else {
                 NodeShape::RoundedRectangle
             };
 
+            if !nodes.contains_key(&name) {
+                node_order.push(name.clone());
+            }
             nodes.insert(name, shape);
             continue;
         }
@@ -93,8 +96,8 @@ pub fn parse_state_diagram(input: &str) -> Result<FlowchartGraph, MermaidError> 
             let from = normalize_state_id(from_raw, true);
             let to = normalize_state_id(to_raw, false);
 
-            referenced.insert(from.clone());
-            referenced.insert(to.clone());
+            ensure_state_node(&mut nodes, &mut node_order, &from);
+            ensure_state_node(&mut nodes, &mut node_order, &to);
             edges.push((from, to, label));
             continue;
         }
@@ -105,21 +108,19 @@ pub fn parse_state_diagram(input: &str) -> Result<FlowchartGraph, MermaidError> 
         });
     }
 
-    for id in referenced {
-        nodes.entry(id).or_insert(NodeShape::RoundedRectangle);
-    }
-
     let mut statements: Vec<Statement> = Vec::new();
-    for (id, shape) in &nodes {
-        let label = match id.as_str() {
-            "__start" => "start".to_string(),
-            "__end" => "end".to_string(),
-            _ => id.clone(),
+    for id in node_order {
+        let Some(shape) = nodes.get(&id) else {
+            continue;
+        };
+        let label = match shape {
+            NodeShape::StartState | NodeShape::EndState | NodeShape::ForkJoin => None,
+            _ => Some(id.clone()),
         };
 
         statements.push(Statement::Node(Node {
             id: id.clone(),
-            label: Some(label),
+            label,
             shape: *shape,
         }));
     }
@@ -150,4 +151,22 @@ fn normalize_state_id(raw: &str, is_from: bool) -> String {
     } else {
         raw.to_string()
     }
+}
+
+fn ensure_state_node(
+    nodes: &mut BTreeMap<String, NodeShape>,
+    node_order: &mut Vec<String>,
+    id: &str,
+) {
+    if nodes.contains_key(id) {
+        return;
+    }
+
+    node_order.push(id.to_string());
+    let shape = match id {
+        "__start" => NodeShape::StartState,
+        "__end" => NodeShape::EndState,
+        _ => NodeShape::RoundedRectangle,
+    };
+    nodes.insert(id.to_string(), shape);
 }

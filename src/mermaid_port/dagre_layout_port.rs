@@ -374,6 +374,9 @@ fn measure_node(label: &str, shape: NodeShape) -> (f64, f64) {
             let diameter = text_width + padding;
             (diameter, diameter)
         }
+        NodeShape::StartState => (14.0, 14.0),
+        NodeShape::EndState => (20.0, 20.0),
+        NodeShape::ForkJoin => (70.0, 10.0),
         NodeShape::Stadium => {
             let h = text_height + padding;
             let w = text_width + h / 4.0 + padding;

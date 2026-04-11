@@ -16,6 +16,7 @@ const GRAPH_MARGIN: f64 = 8.0;
 const LINE_HEIGHT: f64 = 36.75;
 const MIN_ENTITY_WIDTH: f64 = 100.0;
 const FONT_SIZE: f64 = 16.0;
+const COLUMN_TEXT_PADDING: f64 = 8.0;
 
 // --- ER-specific AST ---
 
@@ -343,8 +344,8 @@ fn compute_entity_metrics(entity: &Entity) -> (f64, f64, f64, f64, Vec<f64>) {
     for attr in &entity.attributes {
         let type_w = line_width(&attr.attr_type, DEFAULT_CHAR_WIDTH);
         let name_w = line_width(&attr.name, DEFAULT_CHAR_WIDTH);
-        max_type_width = max_type_width.max(type_w + PADDING);
-        max_name_width = max_name_width.max(name_w + PADDING);
+        max_type_width = max_type_width.max(type_w + COLUMN_TEXT_PADDING * 2.0);
+        max_name_width = max_name_width.max(name_w + COLUMN_TEXT_PADDING * 2.0);
         row_heights.push(LINE_HEIGHT + TEXT_PADDING);
     }
 
@@ -841,7 +842,7 @@ fn render_entity_node(svg: &mut String, entity: &EntityLayout, theme: &MermaidTh
             }
 
             // Type text (left column)
-            let type_text_x = x_offset + PADDING / 2.0;
+            let type_text_x = x_offset + COLUMN_TEXT_PADDING;
             svg.push_str(&format!(
                 "<text x=\"{x}\" y=\"{y}\" text-anchor=\"start\" dominant-baseline=\"middle\" \
                  fill=\"{color}\" class=\"er entityLabel\">{text}</text>",
@@ -852,7 +853,7 @@ fn render_entity_node(svg: &mut String, entity: &EntityLayout, theme: &MermaidTh
             ));
 
             // Name text (right column)
-            let name_text_x = col_divider_x + PADDING / 2.0;
+            let name_text_x = col_divider_x + COLUMN_TEXT_PADDING;
             svg.push_str(&format!(
                 "<text x=\"{x}\" y=\"{y}\" text-anchor=\"start\" dominant-baseline=\"middle\" \
                  fill=\"{color}\" class=\"er entityLabel\">{text}</text>",

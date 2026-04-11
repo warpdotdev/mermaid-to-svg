@@ -628,7 +628,7 @@ fn compute_requirement_box_layout(node: &ReqNode) -> (f64, f64, Vec<LabelLayout>
         ReqNode::Requirement(r) => {
             let mut body = Vec::new();
             if !r.requirement_id.is_empty() {
-                body.push(format!("Id: {}", r.requirement_id));
+                body.push(format!("ID: {}", r.requirement_id));
             }
             if !r.text.is_empty() {
                 body.push(format!("Text: {}", r.text));

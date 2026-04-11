@@ -45,11 +45,8 @@ fn parses_aliased_participants_correctly() {
 fn renders_aliased_participants_without_br_in_svg() {
     let theme = crate::theme::MermaidTheme::default();
     let svg =
-        render_sequence_diagram_to_svg(
-            ALIASED_PARTICIPANTS_WITH_MULTILINE_LABELS_DIAGRAM,
-            &theme,
-        )
-        .expect("should render without error");
+        render_sequence_diagram_to_svg(ALIASED_PARTICIPANTS_WITH_MULTILINE_LABELS_DIAGRAM, &theme)
+            .expect("should render without error");
 
     assert!(!svg.contains("<br/>"), "SVG must not contain literal <br/>");
     assert!(
@@ -128,4 +125,28 @@ fn renders_sequence_diagram_with_opt_and_aliases() {
     assert!(svg.contains("WorkingDirectoriesModel"));
     assert!(svg.contains("get_code_review_view(pane_group_id)"));
     assert!(!svg.contains(">WDModel<"));
+}
+
+#[test]
+fn renders_sequence_fragments() {
+    let svg = render_sequence_diagram_to_svg(
+        r#"sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>Bob: Request
+    alt success
+        Bob-->>Alice: 200 OK
+    else transient failure
+        loop retry up to 3 times
+            Alice->>Bob: Request
+        end
+    end"#,
+        &MermaidTheme::default(),
+    )
+    .expect("sequence diagram should render");
+
+    assert!(svg.contains(">alt<"));
+    assert!(svg.contains("[success]"));
+    assert!(svg.contains(">loop<"));
+    assert!(svg.contains("[retry up to 3 times]"));
 }

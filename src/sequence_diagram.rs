@@ -3,6 +3,15 @@ use crate::theme::MermaidTheme;
 
 use std::collections::BTreeMap;
 
+const SEQUENCE_EVENT_ROW_HEIGHT: f64 = 44.0;
+const SEQUENCE_FRAGMENT_HEADER_HEIGHT: f64 = 28.0;
+const SEQUENCE_FRAGMENT_FOOTER_HEIGHT: f64 = 12.0;
+const SEQUENCE_FRAGMENT_INSET_X: f64 = 18.0;
+const SEQUENCE_FRAGMENT_MARGIN_X: f64 = 20.0;
+const SEQUENCE_FRAGMENT_TAB_PADDING_X: f64 = 10.0;
+const SEQUENCE_FRAGMENT_STROKE: &str = "#d7c8f8";
+const SEQUENCE_FRAGMENT_TEXT: &str = "#4c3f6f";
+
 pub fn render_sequence_diagram_to_svg(
     mermaid_source: &str,
     theme: &MermaidTheme,
@@ -36,11 +45,10 @@ pub fn render_sequence_diagram_to_svg(
         32.0_f64
     };
 
-    let row_h = 44.0_f64;
     let events_top = header_y + header_h + 28.0;
-    // Reserve space for bottom participant boxes (mirrorActors)
+    let (event_y_positions, fragment_layouts, content_bottom) =
+        layout_sequence_events(&diagram.events, events_top);
     let footer_h = header_h;
-    let content_bottom = events_top + diagram.events.len() as f64 * row_h;
     let footer_y = content_bottom + box_margin;
     let height = (footer_y + footer_h + header_y).max(220.0);
 
@@ -63,7 +71,6 @@ pub fn render_sequence_diagram_to_svg(
         "<defs><marker id=\"seq_arrow\" markerWidth=\"8\" markerHeight=\"8\" refX=\"7\" refY=\"4\" orient=\"auto\"><path d=\"M0,0 L8,4 L0,8 Z\" /></marker></defs>",
     );
 
-    // Draw top participant boxes, lifelines, and bottom participant boxes
     for participant in &diagram.participants {
         let x = x_for
             .get(participant.id.as_str())
@@ -71,7 +78,6 @@ pub fn render_sequence_diagram_to_svg(
             .unwrap_or(left_margin);
         let box_x = x - box_w / 2.0;
 
-        // Top participant box
         svg.push_str(&format!(
             "<rect x=\"{box_x:.3}\" y=\"{header_y:.3}\" width=\"{box_w:.3}\" height=\"{header_h:.3}\" rx=\"3\" ry=\"3\" fill=\"{}\" stroke=\"{}\" stroke-width=\"1\"/>",
             theme.node_fill, theme.node_stroke
@@ -83,8 +89,6 @@ pub fn render_sequence_diagram_to_svg(
             &theme.text_color,
         ));
 
-        // Lifeline: solid line from bottom of top box to top of bottom box
-        // Mermaid.js uses solid lines (stroke: #999, stroke-width: 0.5px) for lifelines
         let y0 = header_y + header_h;
         let y1 = footer_y;
         svg.push_str(&format!(
@@ -92,7 +96,6 @@ pub fn render_sequence_diagram_to_svg(
             theme.edge_color
         ));
 
-        // Bottom participant box (mirrorActors)
         svg.push_str(&format!(
             "<rect x=\"{box_x:.3}\" y=\"{footer_y:.3}\" width=\"{box_w:.3}\" height=\"{footer_h:.3}\" rx=\"3\" ry=\"3\" fill=\"{}\" stroke=\"{}\" stroke-width=\"1\"/>",
             theme.node_fill, theme.node_stroke
@@ -105,8 +108,22 @@ pub fn render_sequence_diagram_to_svg(
         ));
     }
 
+    if let Some((min_participant_x, max_participant_x)) = participant_span(&diagram, &x_for) {
+        for fragment in &fragment_layouts {
+            render_fragment(
+                &mut svg,
+                fragment,
+                min_participant_x,
+                max_participant_x,
+                theme,
+            );
+        }
+    }
+
     for (idx, ev) in diagram.events.iter().enumerate() {
-        let y = events_top + idx as f64 * row_h;
+        let Some(y) = event_y_positions.get(idx).copied().flatten() else {
+            continue;
+        };
 
         match ev {
             SequenceEvent::Message {
@@ -125,14 +142,12 @@ pub fn render_sequence_diagram_to_svg(
                 };
 
                 if (x1 - x2).abs() < 1.0 {
-                    // Self-loop: rectangular arc extending to the right of the lifeline
                     let loop_w = 40.0_f64;
-                    let loop_h = row_h * 0.55;
+                    let loop_h = SEQUENCE_EVENT_ROW_HEIGHT * 0.55;
                     let xr = x1 + loop_w;
                     let ye = y + loop_h;
                     svg.push_str(&format!(
-                        "<path d=\"M {x1:.3},{y:.3} L {xr:.3},{y:.3} L {xr:.3},{ye:.3} L {x1:.3},{ye:.3}\" \
-stroke=\"{}\" stroke-width=\"1.5\" fill=\"none\"{dash} marker-end=\"url(#seq_arrow)\"/>",
+                        "<path d=\"M {x1:.3},{y:.3} L {xr:.3},{y:.3} L {xr:.3},{ye:.3} L {x1:.3},{ye:.3}\" stroke=\"{}\" stroke-width=\"1.5\" fill=\"none\"{dash} marker-end=\"url(#seq_arrow)\"/>",
                         theme.edge_color
                     ));
                     if !text.is_empty() {
@@ -183,6 +198,9 @@ stroke=\"{}\" stroke-width=\"1.5\" fill=\"none\"{dash} marker-end=\"url(#seq_arr
                     x = note_x + note_w / 2.0
                 ));
             }
+            SequenceEvent::FragmentStart { .. }
+            | SequenceEvent::FragmentElse { .. }
+            | SequenceEvent::FragmentEnd => {}
         }
     }
 
@@ -211,6 +229,23 @@ impl SequenceParticipant {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+enum SequenceFragmentKind {
+    Alt,
+    Loop,
+    Opt,
+}
+
+impl SequenceFragmentKind {
+    fn keyword(self) -> &'static str {
+        match self {
+            Self::Alt => "alt",
+            Self::Loop => "loop",
+            Self::Opt => "opt",
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 enum SequenceEvent {
     Message {
@@ -224,6 +259,38 @@ enum SequenceEvent {
         to: String,
         text: String,
     },
+    FragmentStart {
+        kind: SequenceFragmentKind,
+        label: String,
+    },
+    FragmentElse {
+        label: String,
+    },
+    FragmentEnd,
+}
+
+#[derive(Debug, Clone)]
+struct SequenceFragmentLayout {
+    kind: SequenceFragmentKind,
+    label: String,
+    depth: usize,
+    start_y: f64,
+    end_y: f64,
+    else_markers: Vec<SequenceElseMarker>,
+}
+
+#[derive(Debug, Clone)]
+struct SequenceElseMarker {
+    separator_y: f64,
+    label: String,
+}
+
+struct OpenSequenceFragment {
+    kind: SequenceFragmentKind,
+    label: String,
+    depth: usize,
+    start_y: f64,
+    else_markers: Vec<SequenceElseMarker>,
 }
 
 fn parse_sequence_diagram(input: &str) -> Result<SequenceDiagram, MermaidError> {
@@ -309,10 +376,8 @@ fn parse_sequence_diagram(input: &str) -> Result<SequenceDiagram, MermaidError> 
             continue;
         }
 
-        if matches!(
-            line.split_whitespace().next(),
-            Some("alt") | Some("else") | Some("loop") | Some("opt") | Some("end")
-        ) {
+        if let Some(fragment) = parse_fragment_line(line) {
+            events.push(fragment);
             continue;
         }
 
@@ -368,6 +433,43 @@ fn parse_message_line(line: &str) -> Option<ParsedMessage> {
         text: text.to_string(),
         dashed,
     })
+}
+
+fn parse_fragment_line(line: &str) -> Option<SequenceEvent> {
+    let trimmed = line.trim();
+
+    if let Some(label) = trimmed.strip_prefix("alt") {
+        return Some(SequenceEvent::FragmentStart {
+            kind: SequenceFragmentKind::Alt,
+            label: label.trim().to_string(),
+        });
+    }
+
+    if let Some(label) = trimmed.strip_prefix("loop") {
+        return Some(SequenceEvent::FragmentStart {
+            kind: SequenceFragmentKind::Loop,
+            label: label.trim().to_string(),
+        });
+    }
+
+    if let Some(label) = trimmed.strip_prefix("opt") {
+        return Some(SequenceEvent::FragmentStart {
+            kind: SequenceFragmentKind::Opt,
+            label: label.trim().to_string(),
+        });
+    }
+
+    if let Some(label) = trimmed.strip_prefix("else") {
+        return Some(SequenceEvent::FragmentElse {
+            label: label.trim().to_string(),
+        });
+    }
+
+    if trimmed == "end" {
+        return Some(SequenceEvent::FragmentEnd);
+    }
+
+    None
 }
 
 fn parse_participant_declaration(
@@ -485,6 +587,158 @@ fn push_unique_alias(aliases: &mut Vec<String>, value: String) {
     }
 }
 
+fn participant_span(diagram: &SequenceDiagram, x_for: &BTreeMap<&str, f64>) -> Option<(f64, f64)> {
+    let mut xs = diagram
+        .participants
+        .iter()
+        .filter_map(|participant| x_for.get(participant.id.as_str()).copied());
+    let first = xs.next()?;
+    let mut min_x = first;
+    let mut max_x = first;
+    for x in xs {
+        min_x = min_x.min(x);
+        max_x = max_x.max(x);
+    }
+    Some((min_x, max_x))
+}
+
+fn layout_sequence_events(
+    events: &[SequenceEvent],
+    events_top: f64,
+) -> (Vec<Option<f64>>, Vec<SequenceFragmentLayout>, f64) {
+    let mut event_y_positions = vec![None; events.len()];
+    let mut fragment_layouts = Vec::new();
+    let mut open_fragments: Vec<OpenSequenceFragment> = Vec::new();
+    let mut cursor_y = events_top;
+
+    for (idx, event) in events.iter().enumerate() {
+        match event {
+            SequenceEvent::Message { .. } | SequenceEvent::NoteOver { .. } => {
+                event_y_positions[idx] = Some(cursor_y + SEQUENCE_EVENT_ROW_HEIGHT / 2.0);
+                cursor_y += SEQUENCE_EVENT_ROW_HEIGHT;
+            }
+            SequenceEvent::FragmentStart { kind, label } => {
+                open_fragments.push(OpenSequenceFragment {
+                    kind: *kind,
+                    label: label.clone(),
+                    depth: open_fragments.len(),
+                    start_y: cursor_y,
+                    else_markers: Vec::new(),
+                });
+                cursor_y += SEQUENCE_FRAGMENT_HEADER_HEIGHT;
+            }
+            SequenceEvent::FragmentElse { label } => {
+                if let Some(fragment) = open_fragments.last_mut() {
+                    fragment.else_markers.push(SequenceElseMarker {
+                        separator_y: cursor_y,
+                        label: label.clone(),
+                    });
+                }
+                cursor_y += SEQUENCE_FRAGMENT_HEADER_HEIGHT;
+            }
+            SequenceEvent::FragmentEnd => {
+                if let Some(fragment) = open_fragments.pop() {
+                    fragment_layouts.push(SequenceFragmentLayout {
+                        kind: fragment.kind,
+                        label: fragment.label,
+                        depth: fragment.depth,
+                        start_y: fragment.start_y,
+                        end_y: cursor_y + SEQUENCE_FRAGMENT_FOOTER_HEIGHT,
+                        else_markers: fragment.else_markers,
+                    });
+                    cursor_y += SEQUENCE_FRAGMENT_FOOTER_HEIGHT;
+                }
+            }
+        }
+    }
+
+    while let Some(fragment) = open_fragments.pop() {
+        fragment_layouts.push(SequenceFragmentLayout {
+            kind: fragment.kind,
+            label: fragment.label,
+            depth: fragment.depth,
+            start_y: fragment.start_y,
+            end_y: cursor_y + SEQUENCE_FRAGMENT_FOOTER_HEIGHT,
+            else_markers: fragment.else_markers,
+        });
+        cursor_y += SEQUENCE_FRAGMENT_FOOTER_HEIGHT;
+    }
+
+    fragment_layouts.sort_by(|a, b| {
+        a.depth
+            .cmp(&b.depth)
+            .then_with(|| a.start_y.total_cmp(&b.start_y))
+    });
+
+    (event_y_positions, fragment_layouts, cursor_y)
+}
+
+fn render_fragment(
+    svg: &mut String,
+    fragment: &SequenceFragmentLayout,
+    min_participant_x: f64,
+    max_participant_x: f64,
+    theme: &MermaidTheme,
+) {
+    let inset = fragment.depth as f64 * SEQUENCE_FRAGMENT_INSET_X;
+    let x = min_participant_x - SEQUENCE_FRAGMENT_MARGIN_X + inset;
+    let width =
+        (max_participant_x - min_participant_x) + SEQUENCE_FRAGMENT_MARGIN_X * 2.0 - inset * 2.0;
+    let height = (fragment.end_y - fragment.start_y).max(SEQUENCE_FRAGMENT_HEADER_HEIGHT);
+    let y = fragment.start_y;
+    let tab_text = fragment.kind.keyword();
+    let tab_text_width = tab_text.chars().count() as f64 * 6.5;
+    let tab_width = tab_text_width + SEQUENCE_FRAGMENT_TAB_PADDING_X * 2.0 + 10.0;
+    let tab_height = 18.0;
+    let tab_x = x + 8.0;
+    let tab_y = y + 4.0;
+    let tab_body_width = (tab_width - 10.0).max(10.0);
+
+    svg.push_str(&format!(
+        "<rect x=\"{x:.3}\" y=\"{y:.3}\" width=\"{width:.3}\" height=\"{height:.3}\" fill=\"none\" stroke=\"{SEQUENCE_FRAGMENT_STROKE}\" stroke-width=\"1\" stroke-dasharray=\"3,3\"/>"
+    ));
+
+    svg.push_str(&format!(
+        "<path d=\"M {tab_x:.3},{tab_y:.3} h {tab_body_width:.3} l 10,0 l 0,10 l -10,8 h -{tab_body_width:.3} z\" fill=\"{}\" stroke=\"{SEQUENCE_FRAGMENT_STROKE}\" stroke-width=\"1\"/>",
+        theme.node_fill
+    ));
+    svg.push_str(&format!(
+        "<text x=\"{text_x:.3}\" y=\"{text_y:.3}\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"Trebuchet MS,Verdana,Arial,sans-serif\" font-size=\"11\" fill=\"{SEQUENCE_FRAGMENT_TEXT}\">{}</text>",
+        escape_xml(tab_text),
+        text_x = tab_x + tab_body_width / 2.0,
+        text_y = tab_y + tab_height / 2.0
+    ));
+
+    if !fragment.label.is_empty() {
+        let label_x = (tab_x + tab_body_width + 18.0).min(x + width - 8.0);
+        svg.push_str(&format!(
+            "<text x=\"{text_x:.3}\" y=\"{text_y:.3}\" text-anchor=\"start\" dominant-baseline=\"central\" font-family=\"Trebuchet MS,Verdana,Arial,sans-serif\" font-size=\"11\" fill=\"{}\">[{}]</text>",
+            theme.text_color,
+            escape_xml(&fragment.label),
+            text_x = label_x,
+            text_y = y + SEQUENCE_FRAGMENT_HEADER_HEIGHT / 2.0
+        ));
+    }
+
+    for else_marker in &fragment.else_markers {
+        svg.push_str(&format!(
+            "<line x1=\"{x:.3}\" y1=\"{y:.3}\" x2=\"{x2:.3}\" y2=\"{y:.3}\" stroke=\"{SEQUENCE_FRAGMENT_STROKE}\" stroke-width=\"1\" stroke-dasharray=\"3,3\"/>",
+            x = x,
+            y = else_marker.separator_y,
+            x2 = x + width
+        ));
+        if !else_marker.label.is_empty() {
+            svg.push_str(&format!(
+                "<text x=\"{text_x:.3}\" y=\"{text_y:.3}\" text-anchor=\"middle\" dominant-baseline=\"central\" font-family=\"Trebuchet MS,Verdana,Arial,sans-serif\" font-size=\"11\" fill=\"{}\">[{}]</text>",
+                theme.text_color,
+                escape_xml(&else_marker.label),
+                text_x = x + width / 2.0,
+                text_y = else_marker.separator_y + SEQUENCE_FRAGMENT_HEADER_HEIGHT / 2.0
+            ));
+        }
+    }
+}
+
 fn estimate_label_box_width(label: &str) -> f64 {
     let char_w = 7.2_f64;
     let padding = 16.0_f64;
@@ -502,8 +756,7 @@ fn render_participant_label(x: f64, cy: f64, label: &str, color: &str) -> String
 
     if lines.len() == 1 {
         return format!(
-            "<text x=\"{x:.3}\" y=\"{cy:.3}\" text-anchor=\"middle\" dominant-baseline=\"middle\" \
-font-family=\"{font}\" font-size=\"{size}\" fill=\"{color}\">{}</text>",
+            "<text x=\"{x:.3}\" y=\"{cy:.3}\" text-anchor=\"middle\" dominant-baseline=\"middle\" font-family=\"{font}\" font-size=\"{size}\" fill=\"{color}\">{}</text>",
             escape_xml(lines[0])
         );
     }
@@ -543,4 +796,3 @@ fn escape_xml(s: &str) -> String {
         .replace('"', "&quot;")
         .replace('\'', "&apos;")
 }
-

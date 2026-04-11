@@ -38,6 +38,9 @@ pub enum NodeShape {
     Subroutine,
     Cylinder,
     Circle,
+    StartState,
+    EndState,
+    ForkJoin,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
