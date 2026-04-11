@@ -144,8 +144,8 @@ fn edge_routes_match_reference_svg_for_01_basic_flowchart() {
     let dx0 = ref_cx - act_cx;
     let dy0 = ref_cy - act_cy;
 
-    let actual_edges = group_edges_by_pair(actual);
-    let reference_edges = group_edges_by_pair(reference);
+    let actual_edges = group_edges_by_pair(&actual);
+    let reference_edges = group_edges_by_pair(&reference);
 
     for (key, ref_list) in reference_edges {
         let act_list = actual_edges.get(&key).expect("edge pair should exist");
@@ -218,8 +218,8 @@ fn edge_routes_match_reference_svg_for_07_horizontal() {
     let dx0 = ref_cx - act_cx;
     let dy0 = ref_cy - act_cy;
 
-    let actual_edges = group_edges_by_pair(actual);
-    let reference_edges = group_edges_by_pair(reference);
+    let actual_edges = group_edges_by_pair(&actual);
+    let reference_edges = group_edges_by_pair(&reference);
 
     for (key, ref_list) in reference_edges {
         let act_list = actual_edges.get(&key).expect("edge pair should exist");
@@ -318,8 +318,8 @@ fn debug_edge_hausdorff_for_01_basic_flowchart() {
     let dx0 = ref_cx - act_cx;
     let dy0 = ref_cy - act_cy;
 
-    let actual_edges = group_edges_by_pair(actual);
-    let reference_edges = group_edges_by_pair(reference);
+    let actual_edges = group_edges_by_pair(&actual);
+    let reference_edges = group_edges_by_pair(&reference);
 
     for (key, ref_list) in reference_edges {
         let Some(act_list) = actual_edges.get(&key) else {
