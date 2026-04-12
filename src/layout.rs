@@ -20,6 +20,13 @@ const MIN_NODE_WIDTH: f64 = 0.0;
 const MIN_NODE_HEIGHT: f64 = 0.0;
 #[allow(dead_code)]
 const EDGE_LABEL_GAP: f64 = 24.0;
+const STATE_CHAR_WIDTH: f64 = 6.7;
+const STATE_NODE_WIDTH_PADDING: f64 = 6.0;
+const STATE_NODE_HEIGHT_PADDING: f64 = 16.0;
+const STATE_NODE_MIN_HEIGHT: f64 = 40.0;
+const STATE_DIAMOND_PADDING: f64 = 18.0;
+const STATE_FORK_WIDTH: f64 = 70.0;
+const STATE_FORK_HEIGHT: f64 = 7.0;
 
 #[derive(Debug, Clone)]
 pub struct LayoutNode {
@@ -32,6 +39,28 @@ pub struct LayoutNode {
     pub label: String,
     pub fill_color: Option<String>,
     pub stroke_color: Option<String>,
+}
+
+fn graph_contains_state_shapes(statements: &[Statement]) -> bool {
+    for statement in statements {
+        match statement {
+            Statement::Node(node) => {
+                if matches!(
+                    node.shape,
+                    NodeShape::StartState | NodeShape::EndState | NodeShape::ForkJoin
+                ) {
+                    return true;
+                }
+            }
+            Statement::Subgraph(subgraph) => {
+                if graph_contains_state_shapes(&subgraph.statements) {
+                    return true;
+                }
+            }
+            _ => {}
+        }
+    }
+    false
 }
 
 #[derive(Debug, Clone)]
@@ -84,6 +113,7 @@ struct SubgraphInfo {
 
 struct LayoutEngine<'a> {
     graph: &'a FlowchartGraph,
+    is_state_diagram: bool,
     nodes: HashMap<String, NodeInfo>,
     edges: Vec<EdgeInfo>,
     subgraphs: Vec<SubgraphInfo>,
@@ -130,6 +160,7 @@ impl<'a> LayoutEngine<'a> {
     fn new(graph: &'a FlowchartGraph) -> Self {
         let mut engine = LayoutEngine {
             graph,
+            is_state_diagram: graph_contains_state_shapes(&graph.statements),
             nodes: HashMap::new(),
             edges: Vec::new(),
             subgraphs: Vec::new(),
@@ -159,6 +190,10 @@ impl<'a> LayoutEngine<'a> {
         dagre_layout(&mut dagre_graph);
         let (mut positions, edge_points, edge_label_positions) =
             self.extract_layout_from_dagre(&dagre_graph, &edge_map);
+        if self.is_state_diagram {
+            self.snap_state_ranks(&mut positions, &back_edges);
+            self.align_state_terminal_singletons(&mut positions, &back_edges);
+        }
         let is_vertical = matches!(
             self.graph.direction,
             GraphDirection::TopToBottom | GraphDirection::BottomToTop
@@ -686,7 +721,7 @@ impl<'a> LayoutEngine<'a> {
         node_sep: f64,
         rank_sep: f64,
         _cluster_analysis: &ClusterAnalysis,
-        _back_edges: &HashSet<(String, String)>,
+        back_edges: &HashSet<(String, String)>,
     ) -> (DagreGraph, EdgeMap) {
         let mut g: DagreGraph = Graph::new(Some(graphlib_rust::GraphOption {
             directed: Some(true),
@@ -700,6 +735,11 @@ impl<'a> LayoutEngine<'a> {
             edgesep: Some(20.0),
             marginx: Some(MARGIN as f32),
             marginy: Some(MARGIN as f32),
+            ranker: if self.is_state_diagram {
+                Some("longest-path".to_string())
+            } else {
+                None
+            },
             ..Default::default()
         });
 
@@ -743,6 +783,9 @@ impl<'a> LayoutEngine<'a> {
         // edges and interfered with dagre's rank/ordering algorithms.
         let mut edge_map: EdgeMap = HashMap::new();
         for (idx, e) in self.edges.iter().enumerate() {
+            if self.is_state_diagram && back_edges.contains(&(e.from.clone(), e.to.clone())) {
+                continue;
+            }
             let mut edge_label = GraphEdge {
                 labelpos: Some("c".to_string()),
                 ..Default::default()
@@ -786,6 +829,164 @@ impl<'a> LayoutEngine<'a> {
             }
         }
         (positions, edge_points, edge_label_positions)
+    }
+
+    fn snap_state_ranks(
+        &self,
+        positions: &mut PositionMap,
+        back_edges: &HashSet<(String, String)>,
+    ) {
+        let ranks = self.longest_path_ranks_without_back_edges(back_edges);
+        if ranks.is_empty() {
+            return;
+        }
+
+        let mut level_positions: Vec<f64> = positions.values().map(|(_, y)| *y).collect();
+        level_positions.sort_by(|a, b| a.total_cmp(b));
+        level_positions.dedup_by(|a, b| (*a - *b).abs() < 0.5);
+
+        let max_rank = ranks.values().copied().max().unwrap_or(0) as usize;
+        if level_positions.len() <= max_rank {
+            return;
+        }
+
+        for (node_id, rank) in ranks {
+            if let Some((_, y)) = positions.get_mut(&node_id) {
+                *y = level_positions[rank as usize];
+            }
+        }
+    }
+
+    fn align_state_terminal_singletons(
+        &self,
+        positions: &mut PositionMap,
+        back_edges: &HashSet<(String, String)>,
+    ) {
+        let ranks = self.longest_path_ranks_without_back_edges(back_edges);
+        if ranks.is_empty() {
+            return;
+        }
+
+        let mut nodes_by_rank: HashMap<i32, Vec<&str>> = HashMap::new();
+        for (node_id, rank) in &ranks {
+            nodes_by_rank.entry(*rank).or_default().push(node_id.as_str());
+        }
+
+        for (node_id, rank) in &ranks {
+            if *rank <= 0 {
+                continue;
+            }
+
+            let Some(rank_nodes) = nodes_by_rank.get(rank) else {
+                continue;
+            };
+            if rank_nodes.len() != 1 {
+                continue;
+            }
+
+            let has_forward_outgoing = self.edges.iter().any(|edge| {
+                edge.from == *node_id && !back_edges.contains(&(edge.from.clone(), edge.to.clone()))
+            });
+            if has_forward_outgoing {
+                continue;
+            }
+
+            let mut predecessor_xs: Vec<f64> = self
+                .edges
+                .iter()
+                .filter(|edge| {
+                    edge.to == *node_id
+                        && !back_edges.contains(&(edge.from.clone(), edge.to.clone()))
+                        && matches!(ranks.get(&edge.from), Some(pred_rank) if *pred_rank < *rank)
+                })
+                .filter_map(|edge| positions.get(&edge.from).map(|(x, _)| *x))
+                .collect();
+            if predecessor_xs.len() < 2 {
+                continue;
+            }
+
+            predecessor_xs.sort_by(|a, b| a.total_cmp(b));
+            if let Some((x, _)) = positions.get_mut(node_id) {
+                *x = *predecessor_xs.last().unwrap_or(x);
+            }
+        }
+    }
+
+    fn longest_path_ranks_without_back_edges(
+        &self,
+        back_edges: &HashSet<(String, String)>,
+    ) -> HashMap<String, i32> {
+        let mut indegree: HashMap<String, usize> = self
+            .nodes
+            .keys()
+            .cloned()
+            .map(|id| (id, 0))
+            .collect();
+
+        for edge in &self.edges {
+            if back_edges.contains(&(edge.from.clone(), edge.to.clone())) {
+                continue;
+            }
+            if let Some(count) = indegree.get_mut(&edge.to) {
+                *count += 1;
+            }
+        }
+
+        let mut ready: Vec<String> = indegree
+            .iter()
+            .filter(|(_, count)| **count == 0)
+            .map(|(id, _)| id.clone())
+            .collect();
+        ready.sort_by_key(|id| self.nodes.get(id).map(|node| node.order).unwrap_or(usize::MAX));
+
+        let mut order: Vec<String> = Vec::new();
+        let mut indegree_mut = indegree;
+        while let Some(node_id) = ready.first().cloned() {
+            ready.remove(0);
+            order.push(node_id.clone());
+            for edge in &self.edges {
+                if edge.from != node_id
+                    || back_edges.contains(&(edge.from.clone(), edge.to.clone()))
+                {
+                    continue;
+                }
+                if let Some(count) = indegree_mut.get_mut(&edge.to) {
+                    *count = count.saturating_sub(1);
+                    if *count == 0 {
+                        ready.push(edge.to.clone());
+                    }
+                }
+            }
+            ready.sort_by_key(|id| {
+                self.nodes
+                    .get(id)
+                    .map(|node| node.order)
+                    .unwrap_or(usize::MAX)
+            });
+        }
+
+        let mut ranks: HashMap<String, i32> = self
+            .nodes
+            .keys()
+            .cloned()
+            .map(|id| (id, 0))
+            .collect();
+
+        for node_id in order {
+            let base_rank = *ranks.get(&node_id).unwrap_or(&0);
+            for edge in &self.edges {
+                if edge.from != node_id
+                    || back_edges.contains(&(edge.from.clone(), edge.to.clone()))
+                {
+                    continue;
+                }
+                if let Some(rank) = ranks.get_mut(&edge.to) {
+                    *rank = (*rank).max(base_rank + 1);
+                }
+            }
+        }
+
+        ranks
     }
 
     #[allow(dead_code)]
@@ -945,9 +1146,34 @@ impl<'a> LayoutEngine<'a> {
     /// Mirrors mermaid.js shape sizing for flowcharts.
     /// Sources: packages/mermaid/src/rendering-util/rendering-elements/shapes/*.ts (question, hexagon, stadium, cylinder, subroutine, rect_left_inv_arrow, circle).
     fn measure_node(&self, label: &str, shape: NodeShape) -> (f64, f64) {
-        let lines = wrap_text_lines(label, DEFAULT_WRAP_WIDTH, DEFAULT_CHAR_WIDTH);
-        let (text_width, text_height) = measure_wrapped_lines(&lines, DEFAULT_CHAR_WIDTH);
+        let char_width = if self.is_state_diagram {
+            STATE_CHAR_WIDTH
+        } else {
+            DEFAULT_CHAR_WIDTH
+        };
+        let lines = wrap_text_lines(label, DEFAULT_WRAP_WIDTH, char_width);
+        let (text_width, text_height) = measure_wrapped_lines(&lines, char_width);
         let padding = FLOWCHART_PADDING;
+        if self.is_state_diagram {
+            match shape {
+                NodeShape::RoundedRectangle => {
+                    let width = (text_width + STATE_NODE_WIDTH_PADDING).max(32.0);
+                    let height =
+                        (text_height + STATE_NODE_HEIGHT_PADDING).max(STATE_NODE_MIN_HEIGHT);
+                    return (width, height);
+                }
+                NodeShape::Diamond => {
+                    let size = (text_width + STATE_DIAMOND_PADDING)
+                        .max(text_height + STATE_DIAMOND_PADDING)
+                        .max(STATE_NODE_MIN_HEIGHT);
+                    return (size, size);
+                }
+                NodeShape::StartState => return (14.0, 14.0),
+                NodeShape::EndState => return (14.0, 14.0),
+                NodeShape::ForkJoin => return (STATE_FORK_WIDTH, STATE_FORK_HEIGHT),
+                _ => {}
+            }
+        }
 
         match shape {
             NodeShape::Rectangle => (text_width + padding * 4.0, text_height + padding * 2.0),
@@ -1003,11 +1229,16 @@ impl<'a> LayoutEngine<'a> {
         if label.trim().is_empty() {
             return None;
         }
-        let lines = wrap_text_lines(label, DEFAULT_WRAP_WIDTH, DEFAULT_CHAR_WIDTH);
+        let char_width = if self.is_state_diagram {
+            STATE_CHAR_WIDTH
+        } else {
+            DEFAULT_CHAR_WIDTH
+        };
+        let lines = wrap_text_lines(label, DEFAULT_WRAP_WIDTH, char_width);
         if lines.is_empty() {
             return None;
         }
-        let (text_width, text_height) = measure_wrapped_lines(&lines, DEFAULT_CHAR_WIDTH);
+        let (text_width, text_height) = measure_wrapped_lines(&lines, char_width);
         let width = text_width + EDGE_LABEL_PADDING * 2.0;
         let height = text_height + EDGE_LABEL_PADDING * 2.0;
         Some((width, height))
