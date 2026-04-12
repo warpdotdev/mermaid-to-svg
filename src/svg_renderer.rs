@@ -23,9 +23,14 @@ const NODE_LABEL_FONT_SIZE: f64 = DEFAULT_FONT_SIZE;
 const NODE_LABEL_LINE_HEIGHT: f64 = DEFAULT_LINE_HEIGHT;
 const EDGE_LABEL_BG_OPACITY: f64 = 0.8;
 const SUBGRAPH_TITLE_TOP_MARGIN: f64 = 0.0;
+const STATE_CHAR_WIDTH: f64 = 6.7;
 
 pub fn render(layout: &LayoutResult, theme: &MermaidTheme) -> String {
-    let mut svg = SvgRenderer::new(layout.width, layout.height, theme);
+    let is_state_diagram = layout
+        .nodes
+        .values()
+        .any(|node| matches!(node.shape, NodeShape::StartState | NodeShape::EndState | NodeShape::ForkJoin));
+    let mut svg = SvgRenderer::new(layout.width, layout.height, theme, is_state_diagram);
     svg.render(layout)
 }
 
@@ -33,15 +38,17 @@ struct SvgRenderer<'a> {
     width: f64,
     height: f64,
     theme: &'a MermaidTheme,
+    is_state_diagram: bool,
     output: String,
 }
 
 impl<'a> SvgRenderer<'a> {
-    fn new(width: f64, height: f64, theme: &'a MermaidTheme) -> Self {
+    fn new(width: f64, height: f64, theme: &'a MermaidTheme, is_state_diagram: bool) -> Self {
         Self {
             width,
             height,
             theme,
+            is_state_diagram,
             output: String::new(),
         }
     }
@@ -170,7 +177,7 @@ impl<'a> SvgRenderer<'a> {
     fn render_start_state(&mut self, node: &LayoutNode) {
         let r = node.width.min(node.height) / 2.0;
         self.output.push_str(&format!(
-            r#"<circle cx="{:.1}" cy="{:.1}" r="{:.1}" fill="{}" stroke="{}" stroke-width="1"/>
+            r#"<circle cx="{:.1}" cy="{:.1}" r="{:.1}" fill="{}" stroke="{}" stroke-width="1.5"/>
 "#,
             node.x, node.y, r, self.theme.edge_color, self.theme.edge_color
         ));
@@ -178,16 +185,16 @@ impl<'a> SvgRenderer<'a> {
 
     fn render_end_state(&mut self, node: &LayoutNode) {
         let outer_r = node.width.min(node.height) / 2.0;
-        let inner_r = (outer_r - 4.0).max(outer_r * 0.55);
+        let inner_r = (outer_r - 4.0).max(outer_r * 0.55).min(outer_r - 2.0);
         self.output.push_str(&format!(
             r#"<circle cx="{:.1}" cy="{:.1}" r="{:.1}" fill="{}" stroke="{}" stroke-width="1"/>
 "#,
-            node.x, node.y, outer_r, self.theme.background, self.theme.edge_color
+            node.x, node.y, outer_r, self.theme.node_stroke, self.theme.background
         ));
         self.output.push_str(&format!(
-            r#"<circle cx="{:.1}" cy="{:.1}" r="{:.1}" fill="{}" stroke="{}" stroke-width="1"/>
+            r#"<circle cx="{:.1}" cy="{:.1}" r="{:.1}" fill="{}" stroke="none"/>
 "#,
-            node.x, node.y, inner_r, self.theme.edge_color, self.theme.edge_color
+            node.x, node.y, inner_r, self.theme.background
         ));
     }
 
@@ -403,7 +410,12 @@ impl<'a> SvgRenderer<'a> {
     }
 
     fn render_text(&mut self, x: f64, y: f64, text: &str) {
-        let lines = wrap_text_lines(text, DEFAULT_WRAP_WIDTH, DEFAULT_CHAR_WIDTH);
+        let char_width = if self.is_state_diagram {
+            STATE_CHAR_WIDTH
+        } else {
+            DEFAULT_CHAR_WIDTH
+        };
+        let lines = wrap_text_lines(text, DEFAULT_WRAP_WIDTH, char_width);
         if lines.is_empty() {
             return;
         }
@@ -688,6 +700,11 @@ impl<'a> SvgRenderer<'a> {
         }
 
         let mut labels: Vec<LabelInfo> = Vec::new();
+        let char_width = if self.is_state_diagram {
+            STATE_CHAR_WIDTH
+        } else {
+            EDGE_LABEL_CHAR_WIDTH
+        };
         for edge in edges {
             let Some(label) = &edge.label else {
                 continue;
@@ -708,14 +725,14 @@ impl<'a> SvgRenderer<'a> {
                 Self::label_position(&label_points)
             };
 
-            let lines = wrap_text_lines(label, EDGE_LABEL_MAX_WIDTH, EDGE_LABEL_CHAR_WIDTH);
+            let lines = wrap_text_lines(label, EDGE_LABEL_MAX_WIDTH, char_width);
             if lines.is_empty() {
                 continue;
             }
 
             let max_line_width = lines
                 .iter()
-                .map(|line| line_width_words(line, EDGE_LABEL_CHAR_WIDTH))
+                .map(|line| line_width_words(line, char_width))
                 .fold(0.0, f64::max);
             let total_height = wrapped_text_height(lines.len());
             let rect_width = max_line_width + EDGE_LABEL_PADDING_H * 2.0;
