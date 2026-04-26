@@ -22,6 +22,29 @@ pub fn parse_mermaid(input: &str) -> Result<FlowchartGraph, MermaidError> {
     parser.parse()
 }
 
+fn normalize_label(label: &str) -> String {
+    let label = strip_wrapping_quotes(label.trim());
+    label
+        .replace("<br/>", "\n")
+        .replace("<br />", "\n")
+        .replace("<br>", "\n")
+        .replace("<BR/>", "\n")
+        .replace("<BR />", "\n")
+        .replace("<BR>", "\n")
+}
+
+fn strip_wrapping_quotes(label: &str) -> &str {
+    let bytes = label.as_bytes();
+    if bytes.len() >= 2
+        && ((bytes[0] == b'"' && bytes[bytes.len() - 1] == b'"')
+            || (bytes[0] == b'\'' && bytes[bytes.len() - 1] == b'\''))
+    {
+        &label[1..label.len() - 1]
+    } else {
+        label
+    }
+}
+
 fn first_non_empty_non_comment_line(input: &str) -> Option<&str> {
     input
         .lines()
@@ -279,7 +302,7 @@ impl<'a> Parser<'a> {
             if let Some(after_pattern) = s.strip_prefix(pattern) {
                 if !label_end.is_empty() {
                     if let Some(end_idx) = after_pattern.find(label_end) {
-                        let label = after_pattern[..end_idx].trim().to_string();
+                        let label = normalize_label(&after_pattern[..end_idx]);
                         let total_len = pattern.len() + end_idx + label_end.len();
                         return Ok((*style, Some(label), total_len));
                     }
@@ -314,7 +337,7 @@ impl<'a> Parser<'a> {
         if let Some(paren_paren_start) = s.find("((") {
             if s.ends_with("))") {
                 let id = s[..paren_paren_start].trim().to_string();
-                let label = s[paren_paren_start + 2..s.len() - 2].to_string();
+                let label = normalize_label(&s[paren_paren_start + 2..s.len() - 2]);
                 let id = if id.is_empty() {
                     label.chars().filter(|c| c.is_alphanumeric()).collect()
                 } else {
@@ -331,7 +354,7 @@ impl<'a> Parser<'a> {
         if let Some(bracket_paren_start) = s.find("([") {
             if s.ends_with("])") {
                 let id = s[..bracket_paren_start].trim().to_string();
-                let label = s[bracket_paren_start + 2..s.len() - 2].to_string();
+                let label = normalize_label(&s[bracket_paren_start + 2..s.len() - 2]);
                 let id = if id.is_empty() {
                     label.chars().filter(|c| c.is_alphanumeric()).collect()
                 } else {
@@ -348,7 +371,7 @@ impl<'a> Parser<'a> {
         if let Some(paren_bracket_start) = s.find("[(") {
             if s.ends_with(")]") {
                 let id = s[..paren_bracket_start].trim().to_string();
-                let label = s[paren_bracket_start + 2..s.len() - 2].to_string();
+                let label = normalize_label(&s[paren_bracket_start + 2..s.len() - 2]);
                 let id = if id.is_empty() {
                     label.chars().filter(|c| c.is_alphanumeric()).collect()
                 } else {
@@ -365,7 +388,7 @@ impl<'a> Parser<'a> {
         if let Some(bracket_bracket_start) = s.find("[[") {
             if s.ends_with("]]") {
                 let id = s[..bracket_bracket_start].trim().to_string();
-                let label = s[bracket_bracket_start + 2..s.len() - 2].to_string();
+                let label = normalize_label(&s[bracket_bracket_start + 2..s.len() - 2]);
                 let id = if id.is_empty() {
                     label.chars().filter(|c| c.is_alphanumeric()).collect()
                 } else {
@@ -382,7 +405,7 @@ impl<'a> Parser<'a> {
         if let Some(brace_brace_start) = s.find("{{") {
             if s.ends_with("}}") {
                 let id = s[..brace_brace_start].trim().to_string();
-                let label = s[brace_brace_start + 2..s.len() - 2].to_string();
+                let label = normalize_label(&s[brace_brace_start + 2..s.len() - 2]);
                 let id = if id.is_empty() {
                     label.chars().filter(|c| c.is_alphanumeric()).collect()
                 } else {
@@ -399,7 +422,7 @@ impl<'a> Parser<'a> {
         if let Some(bracket_start) = s.find('[') {
             if s.ends_with(']') {
                 let id = s[..bracket_start].trim().to_string();
-                let label = s[bracket_start + 1..s.len() - 1].to_string();
+                let label = normalize_label(&s[bracket_start + 1..s.len() - 1]);
                 let id = if id.is_empty() {
                     label.chars().filter(|c| c.is_alphanumeric()).collect()
                 } else {
@@ -416,7 +439,7 @@ impl<'a> Parser<'a> {
         if let Some(paren_start) = s.find('(') {
             if s.ends_with(')') && !s.ends_with("))") {
                 let id = s[..paren_start].trim().to_string();
-                let label = s[paren_start + 1..s.len() - 1].to_string();
+                let label = normalize_label(&s[paren_start + 1..s.len() - 1]);
                 let id = if id.is_empty() {
                     label.chars().filter(|c| c.is_alphanumeric()).collect()
                 } else {
@@ -433,7 +456,7 @@ impl<'a> Parser<'a> {
         if let Some(brace_start) = s.find('{') {
             if s.ends_with('}') && !s.ends_with("}}") {
                 let id = s[..brace_start].trim().to_string();
-                let label = s[brace_start + 1..s.len() - 1].to_string();
+                let label = normalize_label(&s[brace_start + 1..s.len() - 1]);
                 let id = if id.is_empty() {
                     label.chars().filter(|c| c.is_alphanumeric()).collect()
                 } else {
@@ -450,7 +473,7 @@ impl<'a> Parser<'a> {
         if s.contains('>') && s.ends_with(']') {
             if let Some(gt_idx) = s.find('>') {
                 let id = s[..gt_idx].trim().to_string();
-                let label = s[gt_idx + 1..s.len() - 1].to_string();
+                let label = normalize_label(&s[gt_idx + 1..s.len() - 1]);
                 return Some(Node {
                     id,
                     label: Some(label),
@@ -483,7 +506,8 @@ impl<'a> Parser<'a> {
         let (id, title) = if let Some(bracket_start) = after_keyword.find('[') {
             if after_keyword.ends_with(']') {
                 let id = after_keyword[..bracket_start].trim().to_string();
-                let title = after_keyword[bracket_start + 1..after_keyword.len() - 1].to_string();
+                let title =
+                    normalize_label(&after_keyword[bracket_start + 1..after_keyword.len() - 1]);
                 (id, Some(title))
             } else {
                 (after_keyword.to_string(), None)
@@ -491,7 +515,7 @@ impl<'a> Parser<'a> {
         } else if after_keyword.split_whitespace().count() > 1 {
             let id = format!("subGraph{}", self.next_subgraph_index);
             self.next_subgraph_index += 1;
-            (id, Some(after_keyword.to_string()))
+            (id, Some(normalize_label(after_keyword)))
         } else {
             let id = after_keyword.to_string();
             (id, None)

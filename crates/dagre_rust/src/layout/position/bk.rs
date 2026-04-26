@@ -68,7 +68,7 @@ fn find_type_1_conflicts(g: &mut Graph<GraphConfig, GraphNode, GraphEdge>, layer
     }
   }
 
-  layering.iter().reduce(|prev_layer, layer| {
+  layering.iter().filter(|layer| !layer.is_empty()).reduce(|prev_layer, layer| {
     visit_layer(g, &prev_layer, layer, &mut conflicts);
 
     layer
@@ -153,6 +153,9 @@ pub fn find_type_2_conflicts(
   }
 
   for i in 1..layering.len() {
+    if layering[i - 1].is_empty() || layering[i].is_empty() {
+      continue;
+    }
     visit_layer(g, &layering[i - 1], &layering[i], &mut conflicts);
   }
 
@@ -234,7 +237,10 @@ pub fn vertical_alignment(
   layering.iter().for_each(|layer| {
     let mut prev_idx: i32 = -1;
     layer.iter().for_each(|v| {
-      let mut ws: Vec<String> = neighbor_fn(g, v);
+      let mut ws: Vec<String> = neighbor_fn(g, v)
+        .into_iter()
+        .filter(|w| pos.contains_key(w))
+        .collect();
       if ws.len() > 0 {
         ws.sort_by(|w1, w2| {
           pos.get(w1).unwrap().cmp(pos.get(w2).unwrap())
