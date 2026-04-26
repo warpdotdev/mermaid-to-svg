@@ -132,3 +132,24 @@ fn flow_data_tracks_subgraphs_for_06_subgraphs() {
     assert!(!node_a.is_group);
     assert!(!node_d.is_group);
 }
+#[test]
+fn flow_data_does_not_create_vertices_for_subgraph_edge_endpoints() {
+    let mermaid = r#"flowchart TD
+    A[Start]
+    subgraph PIPE["Pipeline"]
+        B[Step]
+    end
+    A --> PIPE
+    PIPE --> C[Done]"#;
+
+    let graph = flow_parser::parse_flowchart(mermaid).expect("mermaid should parse");
+    let db = from_flowchart_graph(&graph);
+
+    assert!(db.subgraphs.iter().any(|subgraph| subgraph.id == "PIPE"));
+    assert!(!db.vertices.contains_key("PIPE"));
+
+    let data = get_data(&db);
+    let pipe_nodes: Vec<_> = data.nodes.iter().filter(|node| node.id == "PIPE").collect();
+    assert_eq!(pipe_nodes.len(), 1);
+    assert!(pipe_nodes[0].is_group);
+}

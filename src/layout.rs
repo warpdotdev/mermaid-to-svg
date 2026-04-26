@@ -223,36 +223,38 @@ impl<'a> LayoutEngine<'a> {
                 ))
             })
             .collect();
+        let layout_subgraphs: Vec<LayoutSubgraph> =
+            self.compute_subgraph_bounds(&layout_nodes, SUBGRAPH_PADDING);
         let layout_edges: Vec<LayoutEdge> = self
             .edges
             .iter()
             .enumerate()
             .filter_map(|(idx, e)| {
-                let from_node = layout_nodes.get(&e.from)?;
-                let to_node = layout_nodes.get(&e.to)?;
-                let is_back_edge = self.is_back_edge(from_node, to_node);
+                let from_node =
+                    self.layout_endpoint_node(&layout_nodes, &layout_subgraphs, &e.from)?;
+                let to_node = self.layout_endpoint_node(&layout_nodes, &layout_subgraphs, &e.to)?;
+                let is_back_edge = self.is_back_edge(&from_node, &to_node);
                 let is_vertical = matches!(
                     self.graph.direction,
                     GraphDirection::TopToBottom | GraphDirection::BottomToTop
                 );
 
-                let dagre_points = edge_points
-                    .get(&idx)
-                    .cloned()
-                    .unwrap_or_else(|| self.fallback_edge_points(&layout_nodes, e));
+                let dagre_points = edge_points.get(&idx).cloned().unwrap_or_else(|| {
+                    self.compute_edge_points_with_obstacles(&from_node, &to_node, &layout_nodes)
+                });
 
                 let mut points = if is_back_edge {
-                    self.compute_back_edge_points(from_node, to_node, is_vertical, &layout_nodes)
+                    self.compute_back_edge_points(&from_node, &to_node, is_vertical, &layout_nodes)
                 } else {
                     self.straighten_if_aligned(
                         &dagre_points,
-                        from_node,
-                        to_node,
+                        &from_node,
+                        &to_node,
                         is_vertical,
                         &layout_nodes,
                     )
                 };
-                self.clip_edge_to_boundaries(&mut points, from_node, to_node);
+                self.clip_edge_to_boundaries(&mut points, &from_node, &to_node);
 
                 let label_pos = e.label.as_ref().and_then(|label| {
                     if label.trim().is_empty() {
@@ -294,12 +296,6 @@ impl<'a> LayoutEngine<'a> {
                 })
             })
             .collect();
-        // Always compute subgraph bounds from actual node positions rather than
-        // dagre's compound graph nodes.  The dagre compound nodes can return stale
-        // or tiny dimensions when node centering / ordering adjustments shift child
-        // positions after layout.
-        let layout_subgraphs: Vec<LayoutSubgraph> =
-            self.compute_subgraph_bounds(&layout_nodes, SUBGRAPH_PADDING);
         let mut min_x = f64::INFINITY;
         let mut min_y = f64::INFINITY;
         for sg in &layout_subgraphs {
@@ -786,6 +782,15 @@ impl<'a> LayoutEngine<'a> {
             if self.is_state_diagram && back_edges.contains(&(e.from.clone(), e.to.clone())) {
                 continue;
             }
+            let dagre_from = self
+                .dagre_edge_endpoint(&e.from, true)
+                .unwrap_or_else(|| e.from.clone());
+            let dagre_to = self
+                .dagre_edge_endpoint(&e.to, false)
+                .unwrap_or_else(|| e.to.clone());
+            if dagre_from == dagre_to {
+                continue;
+            }
             let mut edge_label = GraphEdge {
                 labelpos: Some("c".to_string()),
                 ..Default::default()
@@ -797,8 +802,8 @@ impl<'a> LayoutEngine<'a> {
                 }
             }
 
-            let _ = g.set_edge(&e.from, &e.to, Some(edge_label), None);
-            edge_map.insert(idx, (e.from.clone(), e.to.clone()));
+            let _ = g.set_edge(&dagre_from, &dagre_to, Some(edge_label), None);
+            edge_map.insert(idx, (dagre_from, dagre_to));
         }
         (g, edge_map)
     }
@@ -869,7 +874,10 @@ impl<'a> LayoutEngine<'a> {
 
         let mut nodes_by_rank: HashMap<i32, Vec<&str>> = HashMap::new();
         for (node_id, rank) in &ranks {
-            nodes_by_rank.entry(*rank).or_default().push(node_id.as_str());
+            nodes_by_rank
+                .entry(*rank)
+                .or_default()
+                .push(node_id.as_str());
         }
 
         for (node_id, rank) in &ranks {
@@ -916,12 +924,8 @@ impl<'a> LayoutEngine<'a> {
         &self,
         back_edges: &HashSet<(String, String)>,
     ) -> HashMap<String, i32> {
-        let mut indegree: HashMap<String, usize> = self
-            .nodes
-            .keys()
-            .cloned()
-            .map(|id| (id, 0))
-            .collect();
+        let mut indegree: HashMap<String, usize> =
+            self.nodes.keys().cloned().map(|id| (id, 0)).collect();
 
         for edge in &self.edges {
             if back_edges.contains(&(edge.from.clone(), edge.to.clone())) {
@@ -937,7 +941,12 @@ impl<'a> LayoutEngine<'a> {
             .filter(|(_, count)| **count == 0)
             .map(|(id, _)| id.clone())
             .collect();
-        ready.sort_by_key(|id| self.nodes.get(id).map(|node| node.order).unwrap_or(usize::MAX));
+        ready.sort_by_key(|id| {
+            self.nodes
+                .get(id)
+                .map(|node| node.order)
+                .unwrap_or(usize::MAX)
+        });
 
         let mut order: Vec<String> = Vec::new();
         let mut indegree_mut = indegree;
@@ -965,12 +974,8 @@ impl<'a> LayoutEngine<'a> {
             });
         }
 
-        let mut ranks: HashMap<String, i32> = self
-            .nodes
-            .keys()
-            .cloned()
-            .map(|id| (id, 0))
-            .collect();
+        let mut ranks: HashMap<String, i32> =
+            self.nodes.keys().cloned().map(|id| (id, 0)).collect();
 
         for node_id in order {
             let base_rank = *ranks.get(&node_id).unwrap_or(&0);
@@ -1019,16 +1024,6 @@ impl<'a> LayoutEngine<'a> {
         }
     }
 
-    fn fallback_edge_points(
-        &self,
-        layout_nodes: &HashMap<String, LayoutNode>,
-        e: &EdgeInfo,
-    ) -> Vec<(f64, f64)> {
-        let from_node = &layout_nodes[&e.from];
-        let to_node = &layout_nodes[&e.to];
-        self.compute_edge_points_with_obstacles(from_node, to_node, layout_nodes)
-    }
-
     fn collect_nodes_and_edges(
         &mut self,
         statements: &[Statement],
@@ -1037,6 +1032,9 @@ impl<'a> LayoutEngine<'a> {
         for stmt in statements {
             match stmt {
                 Statement::Node(node) => {
+                    if self.is_subgraph_id(&node.id) {
+                        continue;
+                    }
                     self.add_node(node);
                     if let Some(ref sg_id) = current_subgraph_id {
                         if !self.node_to_subgraph.contains_key(&node.id) {
@@ -1049,11 +1047,15 @@ impl<'a> LayoutEngine<'a> {
                     self.ensure_node_exists(&edge.to);
 
                     if let Some(ref sg_id) = current_subgraph_id {
-                        if !self.node_to_subgraph.contains_key(&edge.from) {
+                        if !self.is_subgraph_id(&edge.from)
+                            && !self.node_to_subgraph.contains_key(&edge.from)
+                        {
                             self.node_to_subgraph
                                 .insert(edge.from.clone(), sg_id.clone());
                         }
-                        if !self.node_to_subgraph.contains_key(&edge.to) {
+                        if !self.is_subgraph_id(&edge.to)
+                            && !self.node_to_subgraph.contains_key(&edge.to)
+                        {
                             self.node_to_subgraph.insert(edge.to.clone(), sg_id.clone());
                         }
                     }
@@ -1092,6 +1094,9 @@ impl<'a> LayoutEngine<'a> {
     }
 
     fn add_node(&mut self, node: &Node) {
+        if self.is_subgraph_id(&node.id) {
+            return;
+        }
         if self.nodes.contains_key(&node.id) && node.label.is_none() {
             return;
         }
@@ -1124,6 +1129,9 @@ impl<'a> LayoutEngine<'a> {
     }
 
     fn ensure_node_exists(&mut self, id: &str) {
+        if self.is_subgraph_id(id) {
+            return;
+        }
         if !self.nodes.contains_key(id) {
             let (width, height) = self.measure_node(id, NodeShape::Rectangle);
             let order = self.next_node_order;
@@ -1141,6 +1149,104 @@ impl<'a> LayoutEngine<'a> {
                 },
             );
         }
+    }
+
+    fn is_subgraph_id(&self, id: &str) -> bool {
+        self.subgraphs.iter().any(|subgraph| subgraph.id == id)
+    }
+
+    fn dagre_edge_endpoint(&self, id: &str, is_source: bool) -> Option<String> {
+        if !self.is_subgraph_id(id) {
+            return Some(id.to_string());
+        }
+
+        if is_source {
+            self.subgraph_exit_node_id(id)
+        } else {
+            self.subgraph_entry_node_id(id)
+        }
+    }
+
+    fn subgraph_entry_node_id(&self, subgraph_id: &str) -> Option<String> {
+        let node_ids = self.nodes_in_subgraph_by_order(subgraph_id);
+        if node_ids.is_empty() {
+            return None;
+        }
+
+        node_ids
+            .iter()
+            .find(|node_id| {
+                !self
+                    .edges
+                    .iter()
+                    .any(|edge| node_ids.contains(&edge.from) && edge.to == **node_id)
+            })
+            .cloned()
+            .or_else(|| node_ids.first().cloned())
+    }
+
+    fn subgraph_exit_node_id(&self, subgraph_id: &str) -> Option<String> {
+        let node_ids = self.nodes_in_subgraph_by_order(subgraph_id);
+        if node_ids.is_empty() {
+            return None;
+        }
+
+        node_ids
+            .iter()
+            .rev()
+            .find(|node_id| {
+                !self
+                    .edges
+                    .iter()
+                    .any(|edge| edge.from == **node_id && node_ids.contains(&edge.to))
+            })
+            .cloned()
+            .or_else(|| node_ids.last().cloned())
+    }
+
+    fn nodes_in_subgraph_by_order(&self, subgraph_id: &str) -> Vec<String> {
+        let mut node_ids: Vec<String> = self
+            .node_to_subgraph
+            .iter()
+            .filter(|(_, sg_id)| sg_id.as_str() == subgraph_id)
+            .map(|(node_id, _)| node_id.clone())
+            .collect();
+        node_ids.sort_by_key(|node_id| {
+            self.nodes
+                .get(node_id)
+                .map(|node| node.order)
+                .unwrap_or(usize::MAX)
+        });
+        node_ids
+    }
+
+    fn layout_endpoint_node(
+        &self,
+        layout_nodes: &HashMap<String, LayoutNode>,
+        layout_subgraphs: &[LayoutSubgraph],
+        id: &str,
+    ) -> Option<LayoutNode> {
+        if let Some(node) = layout_nodes.get(id) {
+            return Some(node.clone());
+        }
+
+        layout_subgraphs
+            .iter()
+            .find(|subgraph| subgraph.id == id)
+            .map(|subgraph| LayoutNode {
+                id: subgraph.id.clone(),
+                x: subgraph.x + subgraph.width / 2.0,
+                y: subgraph.y + subgraph.height / 2.0,
+                width: subgraph.width,
+                height: subgraph.height,
+                shape: NodeShape::Rectangle,
+                label: subgraph
+                    .title
+                    .clone()
+                    .unwrap_or_else(|| subgraph.id.clone()),
+                fill_color: None,
+                stroke_color: None,
+            })
     }
 
     /// Mirrors mermaid.js shape sizing for flowcharts.

@@ -79,6 +79,23 @@ fn test_parse_node_with_label() {
     assert_eq!(nodes[0].label, Some("Start".to_string()));
     assert_eq!(nodes[0].shape, NodeShape::Rectangle);
 }
+#[test]
+fn test_parse_quoted_html_break_labels() {
+    let input = "graph TD\n    A[\"Source<br/>Target\"]";
+    let result = parse_mermaid(input).unwrap();
+
+    let nodes: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Node(n) => Some(n),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(nodes.len(), 1);
+    assert_eq!(nodes[0].label, Some("Source\nTarget".to_string()));
+}
 
 #[test]
 fn test_parse_rounded_node() {

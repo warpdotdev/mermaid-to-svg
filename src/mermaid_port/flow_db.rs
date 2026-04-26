@@ -92,6 +92,9 @@ fn collect_statements(db: &mut FlowDb, statements: &[Statement], current_subgrap
 }
 
 fn ensure_vertex(db: &mut FlowDb, id: &str, label: Option<&str>, shape: NodeShape) {
+    if is_subgraph_id(db, id) {
+        return;
+    }
     let id = id.to_string();
 
     match db.vertices.get_mut(&id) {
@@ -111,6 +114,9 @@ fn ensure_vertex(db: &mut FlowDb, id: &str, label: Option<&str>, shape: NodeShap
 }
 
 fn maybe_assign_to_subgraph(db: &mut FlowDb, node_id: &str, current_subgraph: Option<&str>) {
+    if is_subgraph_id(db, node_id) {
+        return;
+    }
     let Some(subgraph_id) = current_subgraph else {
         return;
     };
@@ -118,4 +124,8 @@ fn maybe_assign_to_subgraph(db: &mut FlowDb, node_id: &str, current_subgraph: Op
     db.node_to_subgraph
         .entry(node_id.to_string())
         .or_insert_with(|| subgraph_id.to_string());
+}
+
+fn is_subgraph_id(db: &FlowDb, id: &str) -> bool {
+    db.subgraphs.iter().any(|subgraph| subgraph.id == id)
 }

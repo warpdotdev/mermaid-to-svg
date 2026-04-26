@@ -1,5 +1,6 @@
 use crate::ast::{Edge, EdgeStyle, FlowchartGraph, GraphDirection, Node, NodeShape, Statement};
 use crate::layout::compute_layout;
+use crate::parser::parse_mermaid;
 
 #[test]
 fn test_single_node_layout() {
@@ -55,6 +56,36 @@ fn test_two_node_edge_layout() {
     let node_a = &result.nodes["A"];
     let node_b = &result.nodes["B"];
     assert!(node_b.y > node_a.y);
+}
+
+#[test]
+fn test_edges_to_subgraphs_do_not_create_rendered_nodes() {
+    let graph = parse_mermaid(
+        r#"flowchart TD
+    A[Start]
+    subgraph PIPE["Pipeline"]
+        B[Step]
+    end
+    A --> PIPE
+    PIPE --> C[Done]"#,
+    )
+    .unwrap();
+
+    let result = compute_layout(&graph);
+
+    assert!(!result.nodes.contains_key("PIPE"));
+    assert!(result
+        .subgraphs
+        .iter()
+        .any(|subgraph| subgraph.id == "PIPE"));
+    assert!(result
+        .edges
+        .iter()
+        .any(|edge| edge.from == "A" && edge.to == "PIPE"));
+    assert!(result
+        .edges
+        .iter()
+        .any(|edge| edge.from == "PIPE" && edge.to == "C"));
 }
 
 #[test]

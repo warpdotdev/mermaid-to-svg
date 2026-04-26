@@ -26,10 +26,12 @@ const SUBGRAPH_TITLE_TOP_MARGIN: f64 = 0.0;
 const STATE_CHAR_WIDTH: f64 = 6.7;
 
 pub fn render(layout: &LayoutResult, theme: &MermaidTheme) -> String {
-    let is_state_diagram = layout
-        .nodes
-        .values()
-        .any(|node| matches!(node.shape, NodeShape::StartState | NodeShape::EndState | NodeShape::ForkJoin));
+    let is_state_diagram = layout.nodes.values().any(|node| {
+        matches!(
+            node.shape,
+            NodeShape::StartState | NodeShape::EndState | NodeShape::ForkJoin
+        )
+    });
     let mut svg = SvgRenderer::new(layout.width, layout.height, theme, is_state_diagram);
     svg.render(layout)
 }
