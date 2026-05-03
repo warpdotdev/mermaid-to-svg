@@ -3,7 +3,7 @@ use crate::theme::MermaidTheme;
 
 use std::collections::BTreeMap;
 
-const SEQUENCE_EVENT_ROW_HEIGHT: f64 = 44.0;
+const SEQUENCE_EVENT_ROW_HEIGHT: f64 = 37.0;
 const SEQUENCE_FRAGMENT_HEADER_HEIGHT: f64 = 28.0;
 const SEQUENCE_FRAGMENT_FOOTER_HEIGHT: f64 = 12.0;
 const SEQUENCE_FRAGMENT_INSET_X: f64 = 18.0;
@@ -155,12 +155,12 @@ pub fn render_sequence_diagram_to_svg(
                 };
 
                 if (x1 - x2).abs() < 1.0 {
-                    let loop_w = 40.0_f64;
-                    let loop_h = SEQUENCE_EVENT_ROW_HEIGHT * 0.55;
+                    let loop_w = 26.0_f64;
+                    let loop_h = SEQUENCE_EVENT_ROW_HEIGHT * 0.42;
                     let xr = x1 + loop_w;
                     let ye = y + loop_h;
                     svg.push_str(&format!(
-                        "<path d=\"M {x1:.3},{y:.3} L {xr:.3},{y:.3} L {xr:.3},{ye:.3} L {x1:.3},{ye:.3}\" stroke=\"{}\" stroke-width=\"1.5\" fill=\"none\"{dash} marker-end=\"url(#seq_arrow)\"/>",
+                        "<path d=\"M {x1:.3},{y:.3} C {xr:.3},{y:.3} {xr:.3},{ye:.3} {x1:.3},{ye:.3}\" stroke=\"{}\" stroke-width=\"1.5\" fill=\"none\"{dash} marker-end=\"url(#seq_arrow)\"/>",
                         theme.edge_color
                     ));
                     if !text.is_empty() {
@@ -851,7 +851,7 @@ fn compute_sequence_pair_spacings(diagram: &SequenceDiagram, box_w: f64) -> Vec<
         if a == b {
             continue;
         }
-        let total_gap = (estimate_sequence_text_width(text) * 0.72).max(box_w + 30.0);
+        let total_gap = (estimate_sequence_text_width(text) * 0.95).max(box_w + 30.0);
         let per_gap = total_gap / (b - a) as f64;
         for spacing in &mut pair_spacings[a..b] {
             *spacing = spacing.max(per_gap);
