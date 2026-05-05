@@ -24,13 +24,23 @@ pub fn parse_mermaid(input: &str) -> Result<FlowchartGraph, MermaidError> {
 
 fn normalize_label(label: &str) -> String {
     let label = strip_wrapping_quotes(label.trim());
-    label
+    decode_html_entities(label)
         .replace("<br/>", "\n")
         .replace("<br />", "\n")
         .replace("<br>", "\n")
         .replace("<BR/>", "\n")
         .replace("<BR />", "\n")
         .replace("<BR>", "\n")
+}
+
+fn decode_html_entities(label: &str) -> String {
+    label
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&#39;", "'")
+        .replace("&apos;", "'")
+        .replace("&amp;", "&")
 }
 
 fn strip_wrapping_quotes(label: &str) -> &str {
@@ -211,6 +221,7 @@ impl<'a> Parser<'a> {
         line.contains("-->")
             || line.contains("---")
             || line.contains("-.->")
+            || (line.contains("-.") && line.contains(".->"))
             || line.contains("-.-")
             || line.contains("==>")
             || line.contains("===")
@@ -273,7 +284,7 @@ impl<'a> Parser<'a> {
     }
 
     fn find_edge_start(&self, s: &str) -> Option<usize> {
-        let patterns = ["-->", "---", "-.->", "-.-", "==>", "==="];
+        let patterns = ["-->", "---", "-.->", "-.-", "-.", "==>", "==="];
         patterns.iter().filter_map(|p| s.find(p)).min()
     }
 
@@ -309,6 +320,14 @@ impl<'a> Parser<'a> {
                 } else {
                     return Ok((*style, None, pattern.len()));
                 }
+            }
+        }
+
+        if let Some(after_pattern) = s.strip_prefix("-.") {
+            if let Some(end_idx) = after_pattern.find(".->") {
+                let label = normalize_label(&after_pattern[..end_idx]);
+                let total_len = 2 + end_idx + ".->".len();
+                return Ok((EdgeStyle::DottedArrow, Some(label), total_len));
             }
         }
 

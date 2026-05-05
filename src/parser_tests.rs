@@ -98,6 +98,48 @@ fn test_parse_quoted_html_break_labels() {
 }
 
 #[test]
+fn test_parse_html_entities_in_labels() {
+    let input = "graph TD\n    A[\"shared_ptr&lt;Connection&gt; &amp; weak_ptr&lt;Player&gt;\"]";
+    let result = parse_mermaid(input).unwrap();
+
+    let nodes: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Node(n) => Some(n),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(nodes.len(), 1);
+    assert_eq!(
+        nodes[0].label,
+        Some("shared_ptr<Connection> & weak_ptr<Player>".to_string())
+    );
+}
+
+#[test]
+fn test_parse_dotted_arrow_with_dot_delimited_label() {
+    let input = "graph TD\n    Room -.weak.-> PlayerA";
+    let result = parse_mermaid(input).unwrap();
+
+    let edges: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Edge(e) => Some(e),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(edges.len(), 1);
+    assert_eq!(edges[0].from, "Room");
+    assert_eq!(edges[0].to, "PlayerA");
+    assert_eq!(edges[0].style, EdgeStyle::DottedArrow);
+    assert_eq!(edges[0].label, Some("weak".to_string()));
+}
+
+#[test]
 fn test_parse_rounded_node() {
     let input = "graph TD\n    A(Rounded)";
     let result = parse_mermaid(input).unwrap();

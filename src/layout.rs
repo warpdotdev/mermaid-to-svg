@@ -774,12 +774,9 @@ impl<'a> LayoutEngine<'a> {
             }
         }
 
-        // Let dagre handle cycles internally via its acyclic phase.
-        // Previously we pre-reversed back-edges, which created duplicate forward
-        // edges and interfered with dagre's rank/ordering algorithms.
         let mut edge_map: EdgeMap = HashMap::new();
         for (idx, e) in self.edges.iter().enumerate() {
-            if self.is_state_diagram && back_edges.contains(&(e.from.clone(), e.to.clone())) {
+            if back_edges.contains(&(e.from.clone(), e.to.clone())) {
                 continue;
             }
             let dagre_from = self
@@ -2768,29 +2765,13 @@ impl<'a> LayoutEngine<'a> {
         let margin = 30.0;
 
         if is_vertical {
-            // Compute both left and right routing options, pick the closer one.
-            let min_y = from.y.min(to.y);
-            let max_y = from.y.max(to.y);
-            let mut max_right = from.x + from.width / 2.0;
-            max_right = max_right.max(to.x + to.width / 2.0);
-            let mut min_left = from.x - from.width / 2.0;
-            min_left = min_left.min(to.x - to.width / 2.0);
-            for node in all_nodes.values() {
-                let node_top = node.y - node.height / 2.0;
-                let node_bottom = node.y + node.height / 2.0;
-                if node_bottom >= min_y - margin && node_top <= max_y + margin {
-                    max_right = max_right.max(node.x + node.width / 2.0);
-                    min_left = min_left.min(node.x - node.width / 2.0);
-                }
-            }
-            let right_x = max_right + margin;
-            let left_x = min_left - margin;
+            let max_right = (from.x + from.width / 2.0).max(to.x + to.width / 2.0);
+            let min_left = (from.x - from.width / 2.0).min(to.x - to.width / 2.0);
             let center_x = (from.x + to.x) / 2.0;
-            // Choose the side that is closer to the from/to center
-            let side_x = if (right_x - center_x).abs() <= (left_x - center_x).abs() {
-                right_x
+            let side_x = if from.x >= to.x {
+                max_right + margin
             } else {
-                left_x
+                min_left - margin
             };
             let start_y = from.y;
             let end_y = to.y;
