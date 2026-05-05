@@ -1,3 +1,6 @@
+use std::collections::HashMap;
+
+use super::{LayoutEngine, LayoutNode};
 use crate::ast::{Edge, EdgeStyle, FlowchartGraph, GraphDirection, Node, NodeShape, Statement};
 use crate::layout::compute_layout;
 use crate::parser::parse_mermaid;
@@ -373,7 +376,102 @@ fn test_cyclic_graph_back_edge_detection() {
     assert!(paused.x > running.x);
     assert!(stopped.x > running.x);
 }
+#[test]
+fn test_cyclic_flowchart_weak_edges_do_not_define_main_rank_flow() {
+    let graph = parse_mermaid(
+        r#"graph TD
+    Hub["Hub<br/>players_: unordered_map&lt;Connection*, shared_ptr&lt;Player&gt;&gt;"]
+    PlayerA["Player A<br/>conn_: shared_ptr&lt;Connection&gt;<br/>room_: shared_ptr&lt;Room&gt;"]
+    Room["Room<br/>host: weak_ptr&lt;Player&gt;<br/>guest: weak_ptr&lt;Player&gt;"]
+    ConnA["Connection A (fd=4)"]
 
+    Hub -->|owns| PlayerA
+    PlayerA -->|owns| ConnA
+    PlayerA -->|shares| Room
+    Room -.weak.-> PlayerA"#,
+    )
+    .expect("diagram should parse");
+
+    let result = compute_layout(&graph);
+
+    let hub = &result.nodes["Hub"];
+    let player_a = &result.nodes["PlayerA"];
+    let room = &result.nodes["Room"];
+    let conn_a = &result.nodes["ConnA"];
+    let weak_edge = result
+        .edges
+        .iter()
+        .find(|edge| edge.from == "Room" && edge.to == "PlayerA")
+        .expect("expected weak back edge");
+
+    assert!(player_a.y > hub.y);
+    assert!(room.y > player_a.y);
+    assert!(conn_a.y > player_a.y);
+    assert_eq!(weak_edge.style, EdgeStyle::DottedArrow);
+    assert_eq!(weak_edge.label.as_deref(), Some("weak"));
+    assert!(weak_edge
+        .points
+        .first()
+        .zip(weak_edge.points.last())
+        .is_some_and(|(start, end)| end.1 < start.1));
+}
+
+#[test]
+fn test_vertical_back_edge_uses_local_side_lane() {
+    let graph = FlowchartGraph {
+        direction: GraphDirection::TopToBottom,
+        statements: vec![],
+    };
+    let engine = LayoutEngine::new(&graph);
+    let from = LayoutNode {
+        id: "Room".to_string(),
+        x: 120.0,
+        y: 200.0,
+        width: 80.0,
+        height: 40.0,
+        shape: NodeShape::Rectangle,
+        label: "Room".to_string(),
+        fill_color: None,
+        stroke_color: None,
+    };
+    let to = LayoutNode {
+        id: "PlayerA".to_string(),
+        x: 40.0,
+        y: 80.0,
+        width: 80.0,
+        height: 40.0,
+        shape: NodeShape::Rectangle,
+        label: "Player A".to_string(),
+        fill_color: None,
+        stroke_color: None,
+    };
+    let far_obstacle = LayoutNode {
+        id: "FarObstacle".to_string(),
+        x: 400.0,
+        y: 140.0,
+        width: 80.0,
+        height: 220.0,
+        shape: NodeShape::Rectangle,
+        label: "Far obstacle".to_string(),
+        fill_color: None,
+        stroke_color: None,
+    };
+    let all_nodes = HashMap::from([
+        (from.id.clone(), from.clone()),
+        (to.id.clone(), to.clone()),
+        (far_obstacle.id.clone(), far_obstacle.clone()),
+    ]);
+
+    let points = engine.compute_back_edge_points(&from, &to, true, &all_nodes);
+    let max_x = points
+        .iter()
+        .map(|(x, _)| *x)
+        .fold(f64::NEG_INFINITY, f64::max);
+    let expected_side_x = from.x + from.width / 2.0 + 30.0;
+
+    assert!((max_x - expected_side_x).abs() < 0.001);
+    assert!(max_x < far_obstacle.x - far_obstacle.width / 2.0);
+}
 #[test]
 fn test_longest_path_ranking() {
     let graph = FlowchartGraph {

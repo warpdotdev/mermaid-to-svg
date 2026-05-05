@@ -208,6 +208,18 @@ mod tests {
     }
 
     #[test]
+    fn test_flowchart_decodes_html_entities_before_svg_escaping() {
+        let mermaid = r#"graph TD
+    A["shared_ptr&lt;Connection&gt; &amp; weak_ptr&lt;Player&gt;"]"#;
+
+        let svg = render_mermaid_to_svg(mermaid, None).expect("should render");
+        assert!(svg.contains("shared_ptr&lt;Connection&gt;"));
+        assert!(svg.contains("weak_ptr&lt;Player&gt;"));
+        assert!(!svg.contains("&amp;lt;Connection&amp;gt;"));
+        assert!(!svg.contains("&amp;amp;"));
+    }
+
+    #[test]
     fn test_invalid_mermaid() {
         let mermaid = "not a valid mermaid diagram";
         let result = render_mermaid_to_svg(mermaid, None);
