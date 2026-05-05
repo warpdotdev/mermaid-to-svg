@@ -3,7 +3,7 @@ use crate::theme::MermaidTheme;
 
 use std::collections::BTreeMap;
 
-const SEQUENCE_EVENT_ROW_HEIGHT: f64 = 44.0;
+const SEQUENCE_EVENT_ROW_HEIGHT: f64 = 37.0;
 const SEQUENCE_FRAGMENT_HEADER_HEIGHT: f64 = 28.0;
 const SEQUENCE_FRAGMENT_FOOTER_HEIGHT: f64 = 12.0;
 const SEQUENCE_FRAGMENT_INSET_X: f64 = 18.0;
@@ -27,12 +27,25 @@ pub fn render_sequence_diagram_to_svg(
         .iter()
         .map(|p| estimate_label_box_width(&p.label))
         .fold(100.0_f64, f64::max);
-    let spacing = box_w + 30.0;
     let left_margin = box_w / 2.0 + edge_pad;
 
     let n = diagram.participants.len().max(1);
-    let width =
-        (left_margin + spacing * (n.saturating_sub(1) as f64) + box_w / 2.0 + edge_pad).max(360.0);
+    let pair_spacings = compute_sequence_pair_spacings(&diagram, box_w);
+    let mut participant_xs = Vec::with_capacity(n);
+    let mut next_x = left_margin;
+    participant_xs.push(next_x);
+    for spacing in pair_spacings {
+        next_x += spacing;
+        participant_xs.push(next_x);
+    }
+    let mut width =
+        (participant_xs.last().copied().unwrap_or(left_margin) + box_w / 2.0 + edge_pad).max(360.0);
+    width = width.max(required_sequence_width(
+        &diagram,
+        &participant_xs,
+        box_w,
+        edge_pad,
+    ));
     let max_label_lines = diagram
         .participants
         .iter()
@@ -53,8 +66,8 @@ pub fn render_sequence_diagram_to_svg(
     let height = (footer_y + footer_h + header_y).max(220.0);
 
     let mut x_for: BTreeMap<&str, f64> = BTreeMap::new();
-    for (idx, participant) in diagram.participants.iter().enumerate() {
-        x_for.insert(participant.id.as_str(), left_margin + idx as f64 * spacing);
+    for (participant, x) in diagram.participants.iter().zip(participant_xs.iter()) {
+        x_for.insert(participant.id.as_str(), *x);
     }
 
     let mut svg = String::new();
@@ -142,12 +155,12 @@ pub fn render_sequence_diagram_to_svg(
                 };
 
                 if (x1 - x2).abs() < 1.0 {
-                    let loop_w = 40.0_f64;
-                    let loop_h = SEQUENCE_EVENT_ROW_HEIGHT * 0.55;
+                    let loop_w = 26.0_f64;
+                    let loop_h = SEQUENCE_EVENT_ROW_HEIGHT * 0.42;
                     let xr = x1 + loop_w;
                     let ye = y + loop_h;
                     svg.push_str(&format!(
-                        "<path d=\"M {x1:.3},{y:.3} L {xr:.3},{y:.3} L {xr:.3},{ye:.3} L {x1:.3},{ye:.3}\" stroke=\"{}\" stroke-width=\"1.5\" fill=\"none\"{dash} marker-end=\"url(#seq_arrow)\"/>",
+                        "<path d=\"M {x1:.3},{y:.3} C {xr:.3},{y:.3} {xr:.3},{ye:.3} {x1:.3},{ye:.3}\" stroke=\"{}\" stroke-width=\"1.5\" fill=\"none\"{dash} marker-end=\"url(#seq_arrow)\"/>",
                         theme.edge_color
                     ));
                     if !text.is_empty() {
@@ -175,29 +188,32 @@ pub fn render_sequence_diagram_to_svg(
                     }
                 }
             }
-            SequenceEvent::NoteOver { from, to, text } => {
-                let x1 = x_for.get(from.as_str()).copied().unwrap_or(left_margin);
-                let x2 = x_for.get(to.as_str()).copied().unwrap_or(left_margin);
+            SequenceEvent::Note { placement, text } => match placement {
+                SequenceNotePlacement::Over { from, to } => {
+                    let x1 = x_for.get(from.as_str()).copied().unwrap_or(left_margin);
+                    let x2 = x_for.get(to.as_str()).copied().unwrap_or(left_margin);
 
-                let (lx, rx) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
-                let pad = 50.0_f64;
-                let note_x = (lx - pad).max(8.0);
-                let note_w = (rx - lx + pad * 2.0).max(120.0);
-                let note_h = 26.0_f64;
-
-                svg.push_str(&format!(
-                    "<rect x=\"{note_x:.3}\" y=\"{ny:.3}\" width=\"{note_w:.3}\" height=\"{note_h:.3}\" rx=\"4\" ry=\"4\" fill=\"#fff2b0\" stroke=\"{}\" stroke-width=\"1\"/>",
-                    theme.edge_color,
-                    ny = y - note_h / 2.0
-                ));
-
-                svg.push_str(&format!(
-                    "<text x=\"{x:.3}\" y=\"{y:.3}\" text-anchor=\"middle\" dominant-baseline=\"middle\" font-family=\"Trebuchet MS,Verdana,Arial,sans-serif\" font-size=\"11\" fill=\"{}\">{}</text>",
-                    theme.text_color,
-                    escape_xml(text),
-                    x = note_x + note_w / 2.0
-                ));
-            }
+                    let (lx, rx) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
+                    let pad = 50.0_f64;
+                    let note_x = (lx - pad).max(8.0);
+                    let note_w = (rx - lx + pad * 2.0).max(120.0);
+                    render_note(&mut svg, note_x, y, note_w, text, theme);
+                }
+                SequenceNotePlacement::Beside { participant, side } => {
+                    let participant_x = x_for
+                        .get(participant.as_str())
+                        .copied()
+                        .unwrap_or(left_margin);
+                    let note_w = estimate_note_width(text).min(380.0);
+                    let note_x = match side {
+                        SequenceNoteSide::Left => (participant_x - note_w - 12.0).max(8.0),
+                        SequenceNoteSide::Right => {
+                            (participant_x + 12.0).min((width - note_w - 8.0).max(8.0))
+                        }
+                    };
+                    render_note(&mut svg, note_x, y, note_w, text, theme);
+                }
+            },
             SequenceEvent::FragmentStart { .. }
             | SequenceEvent::FragmentElse { .. }
             | SequenceEvent::FragmentEnd => {}
@@ -247,6 +263,24 @@ impl SequenceFragmentKind {
 }
 
 #[derive(Debug, Clone)]
+enum SequenceNoteSide {
+    Left,
+    Right,
+}
+
+#[derive(Debug, Clone)]
+enum SequenceNotePlacement {
+    Over {
+        from: String,
+        to: String,
+    },
+    Beside {
+        participant: String,
+        side: SequenceNoteSide,
+    },
+}
+
+#[derive(Debug, Clone)]
 enum SequenceEvent {
     Message {
         from: String,
@@ -254,9 +288,8 @@ enum SequenceEvent {
         text: String,
         dashed: bool,
     },
-    NoteOver {
-        from: String,
-        to: String,
+    Note {
+        placement: SequenceNotePlacement,
         text: String,
     },
     FragmentStart {
@@ -355,10 +388,47 @@ fn parse_sequence_diagram(input: &str) -> Result<SequenceDiagram, MermaidError> 
                 }
             };
 
-            events.push(SequenceEvent::NoteOver {
-                from,
-                to,
-                text: text.to_string(),
+            events.push(SequenceEvent::Note {
+                placement: SequenceNotePlacement::Over { from, to },
+                text: decode_sequence_text(text),
+            });
+            continue;
+        }
+
+        if let Some(rest) = line.strip_prefix("Note right of ") {
+            let Some((who, text)) = rest.split_once(':') else {
+                return Err(MermaidError::ParseError {
+                    line: line_no,
+                    message: format!("Invalid Note syntax: {line}"),
+                });
+            };
+
+            let participant = resolve_participant_ref(&mut participants, who.trim());
+            events.push(SequenceEvent::Note {
+                placement: SequenceNotePlacement::Beside {
+                    participant,
+                    side: SequenceNoteSide::Right,
+                },
+                text: decode_sequence_text(text.trim()),
+            });
+            continue;
+        }
+
+        if let Some(rest) = line.strip_prefix("Note left of ") {
+            let Some((who, text)) = rest.split_once(':') else {
+                return Err(MermaidError::ParseError {
+                    line: line_no,
+                    message: format!("Invalid Note syntax: {line}"),
+                });
+            };
+
+            let participant = resolve_participant_ref(&mut participants, who.trim());
+            events.push(SequenceEvent::Note {
+                placement: SequenceNotePlacement::Beside {
+                    participant,
+                    side: SequenceNoteSide::Left,
+                },
+                text: decode_sequence_text(text.trim()),
             });
             continue;
         }
@@ -613,7 +683,7 @@ fn layout_sequence_events(
 
     for (idx, event) in events.iter().enumerate() {
         match event {
-            SequenceEvent::Message { .. } | SequenceEvent::NoteOver { .. } => {
+            SequenceEvent::Message { .. } | SequenceEvent::Note { .. } => {
                 event_y_positions[idx] = Some(cursor_y + SEQUENCE_EVENT_ROW_HEIGHT / 2.0);
                 cursor_y += SEQUENCE_EVENT_ROW_HEIGHT;
             }
@@ -739,6 +809,127 @@ fn render_fragment(
     }
 }
 
+fn render_note(
+    svg: &mut String,
+    note_x: f64,
+    center_y: f64,
+    note_w: f64,
+    text: &str,
+    theme: &MermaidTheme,
+) {
+    let note_h = 26.0_f64;
+    svg.push_str(&format!(
+        "<rect x=\"{note_x:.3}\" y=\"{ny:.3}\" width=\"{note_w:.3}\" height=\"{note_h:.3}\" rx=\"4\" ry=\"4\" fill=\"#fff2b0\" stroke=\"{}\" stroke-width=\"1\"/>",
+        theme.edge_color,
+        ny = center_y - note_h / 2.0
+    ));
+    svg.push_str(&format!(
+        "<text x=\"{x:.3}\" y=\"{center_y:.3}\" text-anchor=\"middle\" dominant-baseline=\"middle\" font-family=\"Trebuchet MS,Verdana,Arial,sans-serif\" font-size=\"11\" fill=\"{}\">{}</text>",
+        theme.text_color,
+        escape_xml(text),
+        x = note_x + note_w / 2.0
+    ));
+}
+
+fn estimate_note_width(text: &str) -> f64 {
+    (text.chars().count() as f64 * 6.5 + 18.0).max(120.0)
+}
+fn compute_sequence_pair_spacings(diagram: &SequenceDiagram, box_w: f64) -> Vec<f64> {
+    let mut pair_spacings = vec![box_w + 30.0; diagram.participants.len().saturating_sub(1)];
+    for event in &diagram.events {
+        let SequenceEvent::Message { from, to, text, .. } = event else {
+            continue;
+        };
+        let (Some(from_idx), Some(to_idx)) = (
+            participant_index(diagram, from),
+            participant_index(diagram, to),
+        ) else {
+            continue;
+        };
+        let a = from_idx.min(to_idx);
+        let b = from_idx.max(to_idx);
+        if a == b {
+            continue;
+        }
+        let total_gap = (estimate_sequence_text_width(text) * 0.95).max(box_w + 30.0);
+        let per_gap = total_gap / (b - a) as f64;
+        for spacing in &mut pair_spacings[a..b] {
+            *spacing = spacing.max(per_gap);
+        }
+    }
+    pair_spacings
+}
+
+fn required_sequence_width(
+    diagram: &SequenceDiagram,
+    participant_xs: &[f64],
+    box_w: f64,
+    edge_pad: f64,
+) -> f64 {
+    let mut width = participant_xs.last().copied().unwrap_or(0.0) + box_w / 2.0 + edge_pad;
+    for event in &diagram.events {
+        match event {
+            SequenceEvent::Message { from, to, text, .. } => {
+                let (Some(from_idx), Some(to_idx)) = (
+                    participant_index(diagram, from),
+                    participant_index(diagram, to),
+                ) else {
+                    continue;
+                };
+                let x1 = participant_xs.get(from_idx).copied().unwrap_or(0.0);
+                let x2 = participant_xs.get(to_idx).copied().unwrap_or(0.0);
+                if from_idx == to_idx {
+                    width = width.max(x1 + 50.0 + edge_pad);
+                    continue;
+                }
+                let mx = (x1 + x2) / 2.0;
+                width = width.max(mx + estimate_sequence_text_width(text) / 2.0 + edge_pad);
+            }
+            SequenceEvent::Note { placement, text } => match placement {
+                SequenceNotePlacement::Over { from, to } => {
+                    let (Some(from_idx), Some(to_idx)) = (
+                        participant_index(diagram, from),
+                        participant_index(diagram, to),
+                    ) else {
+                        continue;
+                    };
+                    let x1 = participant_xs.get(from_idx).copied().unwrap_or(0.0);
+                    let x2 = participant_xs.get(to_idx).copied().unwrap_or(0.0);
+                    let (lx, rx) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
+                    let note_x = (lx - 50.0).max(8.0);
+                    let note_w = (rx - lx + 100.0).max(120.0);
+                    width = width.max(note_x + note_w + edge_pad);
+                }
+                SequenceNotePlacement::Beside { participant, side } => {
+                    if !matches!(side, SequenceNoteSide::Right) {
+                        continue;
+                    }
+                    let Some(idx) = participant_index(diagram, participant) else {
+                        continue;
+                    };
+                    let x = participant_xs.get(idx).copied().unwrap_or(0.0);
+                    width = width.max(x + 12.0 + estimate_note_width(text).min(380.0) + edge_pad);
+                }
+            },
+            SequenceEvent::FragmentStart { .. }
+            | SequenceEvent::FragmentElse { .. }
+            | SequenceEvent::FragmentEnd => {}
+        }
+    }
+    width
+}
+
+fn participant_index(diagram: &SequenceDiagram, id: &str) -> Option<usize> {
+    diagram
+        .participants
+        .iter()
+        .position(|participant| participant.id == id)
+}
+
+fn estimate_sequence_text_width(text: &str) -> f64 {
+    text.chars().count() as f64 * 6.5
+}
+
 fn estimate_label_box_width(label: &str) -> f64 {
     let char_w = 7.2_f64;
     let padding = 16.0_f64;
@@ -788,6 +979,10 @@ fn render_participant_label(x: f64, cy: f64, label: &str, color: &str) -> String
 #[cfg(test)]
 #[path = "sequence_diagram_tests.rs"]
 mod tests;
+
+fn decode_sequence_text(s: &str) -> String {
+    s.replace("#59;", ";")
+}
 
 fn escape_xml(s: &str) -> String {
     s.replace('&', "&amp;")

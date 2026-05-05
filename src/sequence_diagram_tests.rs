@@ -150,3 +150,17 @@ fn renders_sequence_fragments() {
     assert!(svg.contains(">loop<"));
     assert!(svg.contains("[retry up to 3 times]"));
 }
+
+#[test]
+fn renders_note_right_of_participant_with_escaped_semicolon() {
+    let svg = render_sequence_diagram_to_svg(
+        r#"sequenceDiagram
+    participant S as warp-server
+    Note right of S: previous segment already charged#59; new segment starts fresh"#,
+        &MermaidTheme::default(),
+    )
+    .expect("sequence diagram should render");
+
+    assert!(svg.contains("previous segment already charged; new segment starts fresh"));
+    assert!(!svg.contains("#59;"));
+}
