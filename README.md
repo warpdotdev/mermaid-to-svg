@@ -72,6 +72,8 @@ echo 'graph TD; A-->B' | cargo run --bin render_mermaid > output.svg
 
 See [docs/visual-comparison.md](docs/visual-comparison.md) for a side-by-side comparison of our rendering output against the canonical mermaid-cli across 80 sample diagrams.
 
+See [docs/agent-visual-verification.md](docs/agent-visual-verification.md) for the agent prompt and visual verification loop used to iterate against Mermaid reference output.
+
 ## Testing
 
 ### Unit Tests
