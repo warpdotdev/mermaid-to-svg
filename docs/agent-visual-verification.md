@@ -1,7 +1,9 @@
 # Agent visual verification workflow
+
 This document captures the agent prompts our team used to drive `mermaid_to_svg` toward visual parity with Mermaid reference output.
 
 ## High-level loop
+
 ```mermaid
 flowchart LR
     A[Regenerate canonical images] --> B["~20 Oz agents, sharded by diagram type"]
@@ -17,7 +19,9 @@ flowchart LR
 ```
 
 ## Diagram-type agent prompt
+
 Use this prompt when assigning one agent to improve one diagram type.
+
 ```text
 You are working on mermaid_to_svg.
 Your assignment is to improve ONE diagram type toward Mermaid 11.12.2 visual parity.
@@ -109,40 +113,59 @@ Final report:
 - Remaining known mismatches
 - Branch name
 ```
+
 ## PNG visual comparison protocol
+
 ### Goal
+
 Achieve Mermaid 11.12.2 parity through concrete, fixture-backed PNG diffs.
 Every comparison must produce a detailed, descriptive report that is printed to screen and logged to disk.
+
 ### Reference versions
+
 The scripts pin:
 - `@mermaid-js/mermaid-cli`: `11.4.2`
 - `mermaid`: `11.12.2`
+
 ### Generate PNG pairs
+
 Run:
+
 ```bash
 ./scripts/visual_test.sh <type>
 ```
+
 Outputs:
 - `output/ref_<type>_<name>.png`
 - `output/our_<type>_<name>.png`
 - `output/our_<type>_<name>.svg`
+
 ### Generate HTML comparisons
+
 Run:
+
 ```bash
 ./scripts/visual_compare.sh <type>
 ```
+
 Output:
 - `output/comparison.html`
+
 ### Choose focus fixtures
+
 Per iteration:
 - Prefer exactly one focus fixture.
 - Use at most two or three only when a fix must be validated across a small related set.
+
 ### Validation run directory
+
 `validation_runs/` is gitignored.
 For each iteration, create:
+
 ```bash
 validation_runs/YYYYMMDD_HHMMSS_<gitsha>_<type>/
 ```
+
 Include:
 - `comparison_log.md`
 - `pre_ref_<key>.png`
@@ -151,7 +174,9 @@ Include:
 - `post_ref_<key>.png`
 - `post_our_<key>.png`
 - `post_our_<key>.svg`
+
 ### CV report rules
+
 Every report must include:
 1. Reference image description
 2. Our image description
@@ -162,9 +187,13 @@ Rules:
 - Make every D# specific and testable.
 - Print the report and append it to `comparison_log.md`.
 - If D# differences exist, continue into fix and verification in the same iteration.
+
 ### Report template for flowchart-like diagrams
+
 Use this for diagrams with nodes and connecting edges.
+
 #### 1. Reference image description
+
 - Canvas: background, size, margins, padding.
 - Counts:
   - Nodes
@@ -187,16 +216,22 @@ Use this for diagrams with nodes and connecting edges.
   - Attachment points
   - Label text, background, placement
   - Overlaps
+
 #### 2. Our image description
+
 Repeat the same structure.
+
 #### 3. Differences
+
 For each `D#`:
 - Element(s)
 - Reference behavior
 - Our behavior
 - Magnitude and direction
 - Collision or overlap impact
+
 ### Report template for non-flowchart diagrams
+
 Use the same level of detail:
 - Identify primary primitives:
   - columns/cards for kanban
@@ -206,7 +241,9 @@ Use the same level of detail:
   - participants/messages/fragments for sequence
 - Include counts and complete inventories.
 - Describe text, sizes, shapes, colors, alignment, spacing, and relationships.
+
 ### Fix protocol
+
 When proposing and implementing the next fix:
 1. Reference the D# items it targets.
 2. Search Mermaid 11.12.2 source for relevant terms:
@@ -222,13 +259,17 @@ When proposing and implementing the next fix:
    ./scripts/visual_test.sh <type>
    ```
 6. Produce a post-fix CV report for the same fixture.
+
 ### Restarting work
+
 When resuming, include:
 - Assigned diagram type
 - Latest `validation_runs/.../comparison_log.md`
 - Current focus fixture
 - Latest known D# differences
 - Proposed next fix
+
 ### Edge cases
+
 Some reference output may contain nondeterministic text or IDs, such as gitGraph commit hashes.
 For those cases, document parity criteria before chasing pixel diffs.
