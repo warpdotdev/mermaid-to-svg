@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use dagre_rust::{GraphConfig, GraphEdge, GraphNode};
+use crate::vendor::dagre_rust::{GraphConfig, GraphEdge, GraphNode};
 use graphlib_rust::{Edge, Graph};
 
 pub type DagreGraph = Graph<GraphConfig, GraphNode, GraphEdge>;

@@ -4,8 +4,8 @@ use crate::ast::{EdgeStyle, FlowchartGraph, GraphDirection, Node, NodeShape, Sta
 use crate::text_wrap::{
     measure_wrapped_lines, wrap_text_lines, DEFAULT_CHAR_WIDTH, DEFAULT_WRAP_WIDTH,
 };
-use dagre_rust::layout::layout as dagre_layout;
-use dagre_rust::{GraphConfig, GraphEdge, GraphNode};
+use crate::vendor::dagre_rust::layout::layout as dagre_layout;
+use crate::vendor::dagre_rust::{GraphConfig, GraphEdge, GraphNode};
 use graphlib_rust::Graph;
 
 const FLOWCHART_PADDING: f64 = 15.0;

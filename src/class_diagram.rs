@@ -3,8 +3,8 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 use crate::error::MermaidError;
 use crate::text_wrap::{line_width, DEFAULT_CHAR_WIDTH};
 use crate::theme::MermaidTheme;
-use dagre_rust::layout::layout as dagre_layout;
-use dagre_rust::{GraphConfig, GraphEdge, GraphNode};
+use crate::vendor::dagre_rust::layout::layout as dagre_layout;
+use crate::vendor::dagre_rust::{GraphConfig, GraphEdge, GraphNode};
 use graphlib_rust::Graph;
 
 // --- Constants matching Mermaid 11.12.2 class diagram styles ---

@@ -318,14 +318,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dagre_rust"
-version = "0.0.5"
-dependencies = [
- "graphlib_rust",
- "ordered_hashmap",
-]
-
-[[package]]
 name = "data-url"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -817,14 +809,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "mermaid_to_svg"
+name = "mermaid-to-svg"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "dagre_rust",
  "graphlib_rust",
  "image",
  "insta",
+ "ordered_hashmap",
  "petgraph",
  "regex",
  "resvg",

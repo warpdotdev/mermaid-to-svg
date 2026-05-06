@@ -26,6 +26,7 @@ mod svg_renderer;
 mod text_wrap;
 mod theme;
 mod timeline_diagram;
+mod vendor;
 mod xychart_diagram;
 
 #[cfg(test)]

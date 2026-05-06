@@ -1,16 +1,27 @@
 [package]
-name = "mermaid_to_svg"
+name = "mermaid-to-svg"
 version = "0.1.0"
 edition = "2021"
 authors = ["Warp Team <dev@warp.dev>"]
 description = "Convert Mermaid diagram syntax to SVG"
 license = "MIT"
+repository = "https://github.com/warpdotdev/mermaid-to-svg"
+homepage = "https://github.com/warpdotdev/mermaid-to-svg"
+readme = "README.md"
+keywords = ["mermaid", "svg", "diagram", "renderer"]
+categories = ["visualization", "rendering"]
+exclude = [
+    "output/",
+    "validation_runs/",
+    "third_party/",
+    "node_modules/",
+]
 
 [dependencies]
 regex = "1"
 thiserror = "1.0"
-dagre_rust = { path = "crates/dagre_rust" }  # vendored from 0.0.5 with fixes
 graphlib_rust = "0.0.2"
+ordered_hashmap = "0.0.3"
 petgraph = "0.8.3"
 unicode-segmentation = "1.11"
 serde_yaml = "0.8"

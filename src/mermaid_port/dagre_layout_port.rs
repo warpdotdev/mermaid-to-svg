@@ -5,8 +5,8 @@ use crate::layout::{LayoutEdge, LayoutNode, LayoutResult, LayoutSubgraph};
 use crate::text_wrap::{
     measure_wrapped_lines, wrap_text_lines, DEFAULT_CHAR_WIDTH, DEFAULT_WRAP_WIDTH,
 };
-use dagre_rust::layout::layout as dagre_layout;
-use dagre_rust::{GraphConfig, GraphEdge, GraphNode};
+use crate::vendor::dagre_rust::layout::layout as dagre_layout;
+use crate::vendor::dagre_rust::{GraphConfig, GraphEdge, GraphNode};
 use graphlib_rust::Graph;
 
 use super::cluster_adjust::{adjust_clusters_and_edges, ExtractedCluster};

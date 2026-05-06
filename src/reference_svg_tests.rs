@@ -2,7 +2,7 @@ use super::*;
 
 use crate::fixtures::FixtureCase;
 
-use dagre_rust::{GraphConfig, GraphEdge, GraphNode};
+use crate::vendor::dagre_rust::{GraphConfig, GraphEdge, GraphNode};
 use graphlib_rust::{Graph, GraphOption};
 
 use std::collections::{HashMap, HashSet};
@@ -869,7 +869,7 @@ fn debug_dagre_direct_positions_for_49_dense_connections() {
         let _ = g.set_edge(from, to, Some(GraphEdge::default()), None);
     }
 
-    dagre_rust::layout::layout(&mut g);
+    crate::vendor::dagre_rust::layout::layout(&mut g);
 
     for id in ["A", "B", "C", "D", "E", "F", "G"] {
         let node = g.node(&id.to_string()).expect("node should exist");
@@ -968,9 +968,9 @@ fn debug_dagre_layering_for_49_dense_connections() {
         let _ = g.set_edge(from, to, Some(GraphEdge::default()), None);
     }
 
-    dagre_rust::layout::layout(&mut g);
+    crate::vendor::dagre_rust::layout::layout(&mut g);
 
-    let layering = dagre_rust::layout::util::build_layer_matrix(&g);
+    let layering = crate::vendor::dagre_rust::layout::util::build_layer_matrix(&g);
     for (rank, layer) in layering.iter().enumerate() {
         println!("rank {rank}:");
         for v in layer {
@@ -1071,7 +1071,7 @@ fn debug_dagre_direct_positions_for_26_nested_subgraphs() {
         None,
     );
 
-    dagre_rust::layout::layout(&mut g);
+    crate::vendor::dagre_rust::layout::layout(&mut g);
 
     for id in ["E", "A", "B", "C", "D", "F"] {
         let node = g.node(&id.to_string()).expect("node should exist");
@@ -1175,24 +1175,24 @@ fn debug_edge_dummy_chain_for_e_to_a_in_26_nested_subgraphs() {
         None,
     );
 
-    dagre_rust::layout::make_space_for_edge_labels(&mut g);
-    dagre_rust::layout::remove_self_edges(&mut g);
-    dagre_rust::layout::acyclic::run(&mut g);
-    dagre_rust::layout::nesting_graph::run(&mut g);
+    crate::vendor::dagre_rust::layout::make_space_for_edge_labels(&mut g);
+    crate::vendor::dagre_rust::layout::remove_self_edges(&mut g);
+    crate::vendor::dagre_rust::layout::acyclic::run(&mut g);
+    crate::vendor::dagre_rust::layout::nesting_graph::run(&mut g);
 
-    let mut nc_graph = dagre_rust::layout::util::as_non_compound_graph(&mut g);
-    dagre_rust::layout::rank::rank(&mut nc_graph);
-    dagre_rust::layout::util::transfer_node_edge_labels(&nc_graph, &mut g);
+    let mut nc_graph = crate::vendor::dagre_rust::layout::util::as_non_compound_graph(&mut g);
+    crate::vendor::dagre_rust::layout::rank::rank(&mut nc_graph);
+    crate::vendor::dagre_rust::layout::util::transfer_node_edge_labels(&nc_graph, &mut g);
 
-    dagre_rust::layout::inject_edge_label_proxies(&mut g);
-    dagre_rust::layout::util::remove_empty_ranks(&mut g);
-    dagre_rust::layout::nesting_graph::cleanup(&mut g);
-    dagre_rust::layout::util::normalize_ranks(&mut g);
-    dagre_rust::layout::assign_rank_min_max(&mut g);
-    dagre_rust::layout::remove_edge_label_proxies(&mut g);
+    crate::vendor::dagre_rust::layout::inject_edge_label_proxies(&mut g);
+    crate::vendor::dagre_rust::layout::util::remove_empty_ranks(&mut g);
+    crate::vendor::dagre_rust::layout::nesting_graph::cleanup(&mut g);
+    crate::vendor::dagre_rust::layout::util::normalize_ranks(&mut g);
+    crate::vendor::dagre_rust::layout::assign_rank_min_max(&mut g);
+    crate::vendor::dagre_rust::layout::remove_edge_label_proxies(&mut g);
 
-    dagre_rust::layout::normalize::run(&mut g);
-    dagre_rust::layout::parent_dummy_chains::parent_dummy_chains(&mut g);
+    crate::vendor::dagre_rust::layout::normalize::run(&mut g);
+    crate::vendor::dagre_rust::layout::parent_dummy_chains::parent_dummy_chains(&mut g);
 
     for v in g.nodes() {
         let node = g.node(&v).expect("node should exist");
