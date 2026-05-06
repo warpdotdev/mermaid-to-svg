@@ -122,7 +122,9 @@ cargo insta review
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT, with vendored Apache-2.0 code — see [LICENSE](LICENSE),
+[src/vendor/dagre_rust/LICENSE](src/vendor/dagre_rust/LICENSE), and
+[THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).
 
 This project includes code derived from mermaid.js, dagre.js, and dagre_rust.
 See [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) for details.

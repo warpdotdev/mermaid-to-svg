@@ -58,9 +58,13 @@ SOFTWARE.
 ================================================================================
 
 dagre_rust
-https://github.com/nicksenger/dagre_rust
+Based on dagre_rust v0.0.5 by Ameer Hamza
+Crate metadata: https://crates.io/crates/dagre_rust/0.0.5
+Original repository metadata: https://github.com/r3alst/dagre-rust
+Vendored source reference: https://github.com/nicksenger/dagre_rust
 
-Vendored in crates/dagre_rust/ with local modifications.
+Vendored in src/vendor/dagre_rust/ with local modifications. The GitHub
+repository URLs above may no longer be publicly available.
 
 Copyright 2023 Ameer Hamza
 
@@ -74,4 +78,5 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License.
+limitations under the License. See src/vendor/dagre_rust/LICENSE for the full
+license text.
