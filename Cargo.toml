@@ -13,7 +13,7 @@ dagre_rust = { path = "crates/dagre_rust" }  # vendored from 0.0.5 with fixes
 graphlib_rust = "0.0.2"
 petgraph = "0.8.3"
 unicode-segmentation = "1.11"
-serde_yaml = "0.8"
+serde_yaml = "0.9.34"
 
 [dev-dependencies]
 insta = "1.34"
