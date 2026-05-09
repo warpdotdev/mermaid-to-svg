@@ -185,6 +185,17 @@ mod tests {
     }
 
     #[test]
+    fn test_empty_flowchart_does_not_panic() {
+        let result = render_mermaid_to_svg("graph TD\n", None);
+
+        assert!(result.is_ok());
+        if let Ok(svg) = result {
+            assert!(svg.contains("<svg"));
+            assert!(svg.contains("</svg>"));
+        }
+    }
+
+    #[test]
     fn test_flowchart_with_theme() {
         let mermaid = r#"graph LR
     A --> B"#;
