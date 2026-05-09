@@ -518,6 +518,9 @@ pub fn balance(xss: &OrderedHashMap<String, OrderedHashMap<String, f32>>, align:
 
 pub fn position_x(g: &mut Graph<GraphConfig, GraphNode, GraphEdge>) -> OrderedHashMap<String, f32> {
   let layering = util::build_layer_matrix(g);
+  if layering.iter().all(|layer| layer.is_empty()) {
+    return OrderedHashMap::new();
+  }
   let mut conflicts = find_type_1_conflicts(g, &layering);
   conflicts.extend(find_type_2_conflicts(g, &layering));
 
