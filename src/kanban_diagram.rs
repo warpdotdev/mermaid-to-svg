@@ -446,7 +446,7 @@ fn apply_shape_data(
 }
 
 fn yaml_get_string(map: &Mapping, key: &str) -> Option<String> {
-    let value = map.get(&Value::String(key.to_string()))?;
+    let value = map.get(Value::String(key.to_string()))?;
     match value {
         Value::String(s) => Some(s.clone()),
         Value::Number(n) => Some(n.to_string()),
