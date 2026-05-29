@@ -1,0 +1,11 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+flowchart TD
+    A[Linear curve source] --> B[Left branch]
+    A --> C[Right branch]
+    B --> D[Merge target]
+    C --> D
+    D --> E[Linear path segments]

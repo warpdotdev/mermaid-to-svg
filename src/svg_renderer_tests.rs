@@ -1,7 +1,9 @@
 use crate::ast::{Edge, EdgeStyle, FlowchartGraph, GraphDirection, Node, NodeShape, Statement};
-use crate::layout::compute_layout;
-use crate::svg_renderer::render;
+use crate::config::{FlowchartConfig, RenderConfig};
+use crate::layout::{compute_layout, LayoutEdge, LayoutResult};
+use crate::svg_renderer::{render, render_with_config};
 use crate::theme::MermaidTheme;
+use std::collections::HashMap;
 
 #[test]
 fn test_basic_svg_structure() {
@@ -22,6 +24,57 @@ fn test_basic_svg_structure() {
     assert!(svg.contains("<svg"));
     assert!(svg.contains("</svg>"));
     assert!(svg.contains("Test"));
+}
+
+#[test]
+fn test_render_with_config_applies_font_family_and_size() {
+    let graph = FlowchartGraph {
+        direction: GraphDirection::TopToBottom,
+        statements: vec![Statement::Node(Node {
+            id: "A".to_string(),
+            label: Some("Configured font".to_string()),
+            shape: NodeShape::Rectangle,
+        })],
+    };
+
+    let layout = compute_layout(&graph);
+    let config = RenderConfig {
+        font_family: Some("Inter".to_string()),
+        font_size: Some("22px".to_string()),
+        ..Default::default()
+    };
+    let svg = render_with_config(&layout, &MermaidTheme::default(), &config);
+
+    assert!(svg.contains("font-family=\"Inter\""));
+    assert!(svg.contains("font-size=\"22\""));
+}
+
+#[test]
+fn test_render_with_config_linear_curve_uses_line_segments() {
+    let layout = LayoutResult {
+        nodes: HashMap::new(),
+        edges: vec![LayoutEdge {
+            from: "A".to_string(),
+            to: "B".to_string(),
+            label: None,
+            style: EdgeStyle::Line,
+            points: vec![(0.0, 0.0), (40.0, 30.0), (80.0, 0.0)],
+            label_pos: None,
+        }],
+        subgraphs: Vec::new(),
+        width: 100.0,
+        height: 60.0,
+    };
+    let config = RenderConfig {
+        flowchart: FlowchartConfig {
+            curve: Some("linear".to_string()),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let svg = render_with_config(&layout, &MermaidTheme::default(), &config);
+
+    assert!(svg.contains("d=\"M0.0,0.0L40.0,30.0L80.0,0.0\""));
 }
 
 #[test]

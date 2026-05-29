@@ -6,14 +6,20 @@ mod flow_parser;
 
 use crate::error::MermaidError;
 use crate::theme::MermaidTheme;
+use crate::RenderConfig;
 
 pub fn render_mermaid_to_svg_ported(
     mermaid_source: &str,
     theme: &MermaidTheme,
+    config: &RenderConfig,
 ) -> Result<String, MermaidError> {
     let graph = flow_parser::parse_flowchart(mermaid_source)?;
-    let layout_result = dagre_layout_port::compute_layout_ported(&graph);
-    Ok(crate::svg_renderer::render(&layout_result, theme))
+    let layout_result = dagre_layout_port::compute_layout_ported_with_config(&graph, config);
+    Ok(crate::svg_renderer::render_with_config(
+        &layout_result,
+        theme,
+        config,
+    ))
 }
 
 pub fn is_enabled() -> bool {

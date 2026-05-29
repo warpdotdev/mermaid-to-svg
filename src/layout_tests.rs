@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use super::{LayoutEngine, LayoutNode};
 use crate::ast::{Edge, EdgeStyle, FlowchartGraph, GraphDirection, Node, NodeShape, Statement};
-use crate::layout::compute_layout;
+use crate::config::{FlowchartConfig, RenderConfig};
+use crate::layout::{compute_layout, compute_layout_with_config};
 use crate::parser::parse_mermaid;
 
 #[test]
@@ -25,6 +26,63 @@ fn test_single_node_layout() {
     assert_eq!(node.label, "Start");
     assert!(node.width > 0.0);
     assert!(node.height > 0.0);
+}
+
+#[test]
+fn test_flowchart_spacing_config_increases_rank_distance() {
+    let graph = FlowchartGraph {
+        direction: GraphDirection::TopToBottom,
+        statements: vec![Statement::Edge(Edge {
+            from: "A".to_string(),
+            to: "B".to_string(),
+            label: None,
+            style: EdgeStyle::Arrow,
+        })],
+    };
+
+    let default_layout = compute_layout(&graph);
+    let config = RenderConfig {
+        flowchart: FlowchartConfig {
+            rank_spacing: Some(140),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let configured_layout = compute_layout_with_config(&graph, &config);
+
+    let default_delta = default_layout.nodes["B"].y - default_layout.nodes["A"].y;
+    let configured_delta = configured_layout.nodes["B"].y - configured_layout.nodes["A"].y;
+
+    assert!(configured_delta > default_delta);
+}
+
+#[test]
+fn test_flowchart_padding_and_wrapping_config_affect_node_size() {
+    let graph = FlowchartGraph {
+        direction: GraphDirection::TopToBottom,
+        statements: vec![Statement::Node(Node {
+            id: "A".to_string(),
+            label: Some("Long label that wraps across several rendered lines".to_string()),
+            shape: NodeShape::Rectangle,
+        })],
+    };
+
+    let default_layout = compute_layout(&graph);
+    let config = RenderConfig {
+        flowchart: FlowchartConfig {
+            padding: Some(4),
+            wrapping_width: Some(70),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let configured_layout = compute_layout_with_config(&graph, &config);
+
+    let default_node = &default_layout.nodes["A"];
+    let configured_node = &configured_layout.nodes["A"];
+
+    assert!(configured_node.height > default_node.height);
+    assert!(configured_node.width < default_node.width);
 }
 
 #[test]
