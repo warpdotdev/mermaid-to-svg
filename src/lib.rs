@@ -3,6 +3,7 @@ mod ast;
 mod block_diagram;
 mod c4_diagram;
 mod class_diagram;
+pub mod config;
 mod er_diagram;
 mod error;
 pub mod fixtures;
@@ -32,17 +33,22 @@ mod xychart_diagram;
 #[cfg(test)]
 mod reference_svg;
 
+pub use config::{parse_mermaid_frontmatter, FlowchartConfig, ParsedMermaidSource, RenderConfig};
 pub use error::MermaidError;
-pub use theme::MermaidTheme;
+pub use theme::{MermaidTheme, MermaidThemePreset, MermaidThemeVariables};
 
 pub fn render_mermaid_to_svg(
     mermaid_source: &str,
     theme: Option<&MermaidTheme>,
 ) -> Result<String, MermaidError> {
+    let parsed_source = parse_mermaid_frontmatter(mermaid_source);
     let default_theme = MermaidTheme::default();
-    let theme = theme.unwrap_or(&default_theme);
-    let mermaid_source = strip_mermaid_frontmatter(mermaid_source);
-    let mermaid_source = mermaid_source.as_ref();
+    let configured_theme = parsed_source.config.to_mermaid_theme();
+    let theme = match theme {
+        Some(theme) => theme,
+        None => configured_theme.as_ref().unwrap_or(&default_theme),
+    };
+    let mermaid_source = parsed_source.body.as_ref();
 
     let diagram_type = first_diagram_type_token(mermaid_source);
 
@@ -151,40 +157,10 @@ pub fn render_mermaid_to_svg(
 /// Strip a leading Mermaid YAML frontmatter block delimited by `---` lines.
 ///
 /// Mermaid supports frontmatter at the start of a diagram for per-diagram
-/// metadata and configuration. This renderer currently ignores those metadata
-/// and configuration values, but strips the block before diagram dispatch so the
-/// first real diagram token is detected correctly.
+/// metadata and configuration. Use `parse_mermaid_frontmatter` to access parsed
+/// metadata and config values.
 pub fn strip_mermaid_frontmatter(source: &str) -> Cow<'_, str> {
-    fn next_line_end(s: &str, start: usize) -> usize {
-        s[start..]
-            .find('\n')
-            .map(|p| start + p + 1)
-            .unwrap_or(s.len())
-    }
-
-    let mut cursor = 0;
-    while cursor < source.len() {
-        let end = next_line_end(source, cursor);
-        let line = source[cursor..end].trim();
-        if line.is_empty() {
-            cursor = end;
-            continue;
-        }
-        if line != "---" {
-            return Cow::Borrowed(source);
-        }
-        let mut scan = end;
-        while scan < source.len() {
-            let scan_end = next_line_end(source, scan);
-            if source[scan..scan_end].trim() == "---" {
-                return Cow::Owned(source[scan_end..].to_string());
-            }
-            scan = scan_end;
-        }
-        return Cow::Borrowed(source);
-    }
-
-    Cow::Borrowed(source)
+    parse_mermaid_frontmatter(source).body
 }
 
 fn first_diagram_type_token(input: &str) -> Option<&str> {
@@ -366,7 +342,7 @@ xychart-beta
     }
 
     #[test]
-    fn test_render_mermaid_to_svg_ignores_frontmatter_config_values() {
+    fn test_render_mermaid_to_svg_applies_frontmatter_theme_values() {
         let mermaid = r#"---
 config:
   theme: dark
@@ -379,7 +355,28 @@ graph TD
             Ok(svg) => svg,
             Err(err) => panic!("expected ok result, got error: {err}"),
         };
+        assert!(svg.contains("background-color: #1e1e1e"));
+    }
+
+    #[test]
+    fn test_render_mermaid_to_svg_explicit_theme_overrides_frontmatter_theme() {
+        let mermaid = r##"---
+config:
+  theme: dark
+  themeVariables:
+    background: "#101010"
+---
+graph TD
+    A --> B"##;
+
+        let theme = MermaidTheme::light();
+        let result = render_mermaid_to_svg(mermaid, Some(&theme));
+        let svg = match result {
+            Ok(svg) => svg,
+            Err(err) => panic!("expected ok result, got error: {err}"),
+        };
         assert!(svg.contains("background-color: #ffffff"));
+        assert!(!svg.contains("background-color: #101010"));
     }
 
     #[test]
