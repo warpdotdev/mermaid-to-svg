@@ -229,6 +229,16 @@ mod tests {
         assert!(!svg.contains("&amp;lt;Connection&amp;gt;"));
         assert!(!svg.contains("&amp;amp;"));
     }
+    #[test]
+    fn test_flowchart_renders_escaped_newline_label_as_multiple_lines() {
+        let mermaid = r#"graph TD
+    A["Source\nTarget"]"#;
+
+        let svg = render_mermaid_to_svg(mermaid, None).expect("should render");
+        assert!(svg.contains(">Source</tspan>"));
+        assert!(svg.contains(">Target</tspan>"));
+        assert!(!svg.contains("Source\\nTarget"));
+    }
 
     #[test]
     fn test_invalid_mermaid() {

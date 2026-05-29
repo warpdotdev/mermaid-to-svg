@@ -25,6 +25,7 @@ pub fn parse_mermaid(input: &str) -> Result<FlowchartGraph, MermaidError> {
 fn normalize_label(label: &str) -> String {
     let label = strip_wrapping_quotes(label.trim());
     decode_html_entities(label)
+        .replace("\\n", "\n")
         .replace("<br/>", "\n")
         .replace("<br />", "\n")
         .replace("<br>", "\n")

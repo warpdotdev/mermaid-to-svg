@@ -61,6 +61,24 @@ fn test_parse_edge_with_label() {
 }
 
 #[test]
+fn test_parse_escaped_newline_edge_label() {
+    let input = r#"graph TD
+    A -->|Yes\ncontinue| B"#;
+    let result = parse_mermaid(input).unwrap();
+
+    let edges: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Edge(e) => Some(e),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(edges.len(), 1);
+    assert_eq!(edges[0].label, Some("Yes\ncontinue".to_string()));
+}
+#[test]
 fn test_parse_node_with_label() {
     let input = "graph TD\n    A[Start] --> B[End]";
     let result = parse_mermaid(input).unwrap();
@@ -97,6 +115,24 @@ fn test_parse_quoted_html_break_labels() {
     assert_eq!(nodes[0].label, Some("Source\nTarget".to_string()));
 }
 
+#[test]
+fn test_parse_escaped_newline_node_label() {
+    let input = r#"graph TD
+    A["Source\nTarget"]"#;
+    let result = parse_mermaid(input).unwrap();
+
+    let nodes: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Node(n) => Some(n),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(nodes.len(), 1);
+    assert_eq!(nodes[0].label, Some("Source\nTarget".to_string()));
+}
 #[test]
 fn test_parse_html_entities_in_labels() {
     let input = "graph TD\n    A[\"shared_ptr&lt;Connection&gt; &amp; weak_ptr&lt;Player&gt;\"]";
@@ -268,6 +304,26 @@ fn test_parse_subgraph() {
     assert_eq!(subgraphs[0].id, "Group");
 }
 
+#[test]
+fn test_parse_escaped_newline_subgraph_title() {
+    let input = r#"graph TD
+    subgraph Group["Outer\nGroup"]
+        A --> B
+    end"#;
+    let result = parse_mermaid(input).unwrap();
+
+    let subgraphs: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Subgraph(sg) => Some(sg),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(subgraphs.len(), 1);
+    assert_eq!(subgraphs[0].title, Some("Outer\nGroup".to_string()));
+}
 #[test]
 fn test_parse_style_statement() {
     let input = "graph TD\n    A --> B\n    style A fill:#f9f,stroke:#333";
