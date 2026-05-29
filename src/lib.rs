@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 mod ast;
 mod block_diagram;
 mod c4_diagram;
@@ -40,6 +41,8 @@ pub fn render_mermaid_to_svg(
 ) -> Result<String, MermaidError> {
     let default_theme = MermaidTheme::default();
     let theme = theme.unwrap_or(&default_theme);
+    let mermaid_source = strip_mermaid_frontmatter(mermaid_source);
+    let mermaid_source = mermaid_source.as_ref();
 
     let diagram_type = first_diagram_type_token(mermaid_source);
 
@@ -145,6 +148,45 @@ pub fn render_mermaid_to_svg(
     Ok(svg)
 }
 
+/// Strip a leading Mermaid YAML frontmatter block delimited by `---` lines.
+///
+/// Mermaid supports frontmatter at the start of a diagram for per-diagram
+/// metadata and configuration. This renderer currently ignores those metadata
+/// and configuration values, but strips the block before diagram dispatch so the
+/// first real diagram token is detected correctly.
+pub fn strip_mermaid_frontmatter(source: &str) -> Cow<'_, str> {
+    fn next_line_end(s: &str, start: usize) -> usize {
+        s[start..]
+            .find('\n')
+            .map(|p| start + p + 1)
+            .unwrap_or(s.len())
+    }
+
+    let mut cursor = 0;
+    while cursor < source.len() {
+        let end = next_line_end(source, cursor);
+        let line = source[cursor..end].trim();
+        if line.is_empty() {
+            cursor = end;
+            continue;
+        }
+        if line != "---" {
+            return Cow::Borrowed(source);
+        }
+        let mut scan = end;
+        while scan < source.len() {
+            let scan_end = next_line_end(source, scan);
+            if source[scan..scan_end].trim() == "---" {
+                return Cow::Owned(source[scan_end..].to_string());
+            }
+            scan = scan_end;
+        }
+        return Cow::Borrowed(source);
+    }
+
+    Cow::Borrowed(source)
+}
+
 fn first_diagram_type_token(input: &str) -> Option<&str> {
     input
         .lines()
@@ -216,6 +258,128 @@ mod tests {
 
         let result = render_mermaid_to_svg(mermaid, None);
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_removes_leading_config_block() {
+        let source = r#"---
+config:
+  theme: default
+---
+xychart-beta
+  title "x"
+"#;
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(
+            stripped,
+            r#"xychart-beta
+  title "x"
+"#
+        );
+        assert!(matches!(stripped, std::borrow::Cow::Owned(_)));
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_preserves_source_without_frontmatter() {
+        let source = "graph TD\nA --> B\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, source);
+        assert!(matches!(stripped, std::borrow::Cow::Borrowed(_)));
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_skips_leading_blank_lines() {
+        let source = r#"
+
+   
+---
+config:
+  theme: dark
+---
+pie
+  "a" : 1
+"#;
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(
+            stripped,
+            r#"pie
+  "a" : 1
+"#
+        );
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_handles_crlf_line_endings() {
+        let source = "---\r\nconfig:\r\n  theme: default\r\n---\r\nflowchart TD\r\nA --> B\r\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, "flowchart TD\r\nA --> B\r\n");
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_leaves_unterminated_block() {
+        let source = "---\nconfig:\n  theme: default\nflowchart TD\nA --> B\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, source);
+        assert!(matches!(stripped, std::borrow::Cow::Borrowed(_)));
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_handles_only_frontmatter_no_body() {
+        let source = "---\nconfig: {}\n---\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, "");
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_handles_frontmatter_without_trailing_newline() {
+        let source = "---\nfoo: bar\n---";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, "");
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_treats_indented_dashes_as_delimiter() {
+        let source = "\t---\n  config: x\n  ---\nflowchart TD\nA --> B\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, "flowchart TD\nA --> B\n");
+    }
+
+    #[test]
+    fn test_render_mermaid_to_svg_dispatches_after_frontmatter() {
+        let mermaid = r#"---
+config:
+  theme: default
+---
+xychart-beta
+    title Demo
+    x-axis 0 --> 10
+    y-axis 0 --> 100
+    line [5, 10, 20, 40]"#;
+
+        let result = render_mermaid_to_svg(mermaid, None);
+        let svg = match result {
+            Ok(svg) => svg,
+            Err(err) => panic!("expected ok result, got error: {err}"),
+        };
+        assert!(svg.contains("<svg"));
+        assert!(svg.contains("Demo"));
+    }
+
+    #[test]
+    fn test_render_mermaid_to_svg_ignores_frontmatter_config_values() {
+        let mermaid = r#"---
+config:
+  theme: dark
+---
+graph TD
+    A --> B"#;
+
+        let result = render_mermaid_to_svg(mermaid, None);
+        let svg = match result {
+            Ok(svg) => svg,
+            Err(err) => panic!("expected ok result, got error: {err}"),
+        };
+        assert!(svg.contains("background-color: #ffffff"));
     }
 
     #[test]
