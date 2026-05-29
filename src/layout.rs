@@ -1,6 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::ast::{EdgeStyle, FlowchartGraph, GraphDirection, Node, NodeShape, Statement};
+use crate::config::RenderConfig;
 use crate::text_wrap::{
     measure_wrapped_lines, wrap_text_lines, DEFAULT_CHAR_WIDTH, DEFAULT_WRAP_WIDTH,
 };
@@ -98,10 +99,25 @@ pub fn compute_layout(graph: &FlowchartGraph) -> LayoutResult {
     let mut layout = LayoutEngine::new(graph);
     layout.compute_with_dagre(true)
 }
+pub fn compute_layout_with_config(graph: &FlowchartGraph, config: &RenderConfig) -> LayoutResult {
+    let mut layout =
+        LayoutEngine::new_with_options(graph, FlowchartLayoutOptions::from_render_config(config));
+    layout.compute_with_dagre(true)
+}
 
 #[allow(dead_code)]
 pub fn compute_layout_no_subgraph_centering(graph: &FlowchartGraph) -> LayoutResult {
     let mut layout = LayoutEngine::new(graph);
+    layout.compute_with_dagre(false)
+}
+
+#[allow(dead_code)]
+pub fn compute_layout_no_subgraph_centering_with_config(
+    graph: &FlowchartGraph,
+    config: &RenderConfig,
+) -> LayoutResult {
+    let mut layout =
+        LayoutEngine::new_with_options(graph, FlowchartLayoutOptions::from_render_config(config));
     layout.compute_with_dagre(false)
 }
 
@@ -113,6 +129,7 @@ struct SubgraphInfo {
 
 struct LayoutEngine<'a> {
     graph: &'a FlowchartGraph,
+    options: FlowchartLayoutOptions,
     is_state_diagram: bool,
     nodes: HashMap<String, NodeInfo>,
     edges: Vec<EdgeInfo>,
@@ -155,11 +172,62 @@ type EdgeMap = HashMap<usize, (String, String)>;
 type PositionMap = HashMap<String, (f64, f64)>;
 type EdgePointMap = HashMap<usize, Vec<(f64, f64)>>;
 type EdgeLabelPosMap = HashMap<usize, (f64, f64)>;
+#[derive(Debug, Clone, Copy)]
+struct FlowchartLayoutOptions {
+    node_spacing: f64,
+    rank_spacing: f64,
+    padding: f64,
+    wrapping_width: f64,
+}
+
+impl Default for FlowchartLayoutOptions {
+    fn default() -> Self {
+        Self {
+            node_spacing: NODE_SEP,
+            rank_spacing: RANK_SEP,
+            padding: FLOWCHART_PADDING,
+            wrapping_width: DEFAULT_WRAP_WIDTH,
+        }
+    }
+}
+
+impl FlowchartLayoutOptions {
+    fn from_render_config(config: &RenderConfig) -> Self {
+        let default = Self::default();
+        Self {
+            node_spacing: config
+                .flowchart
+                .node_spacing
+                .map(f64::from)
+                .unwrap_or(default.node_spacing),
+            rank_spacing: config
+                .flowchart
+                .rank_spacing
+                .map(f64::from)
+                .unwrap_or(default.rank_spacing),
+            padding: config
+                .flowchart
+                .padding
+                .map(f64::from)
+                .unwrap_or(default.padding),
+            wrapping_width: config
+                .flowchart
+                .wrapping_width
+                .map(f64::from)
+                .unwrap_or(default.wrapping_width),
+        }
+    }
+}
 
 impl<'a> LayoutEngine<'a> {
     fn new(graph: &'a FlowchartGraph) -> Self {
+        Self::new_with_options(graph, FlowchartLayoutOptions::default())
+    }
+
+    fn new_with_options(graph: &'a FlowchartGraph, options: FlowchartLayoutOptions) -> Self {
         let mut engine = LayoutEngine {
             graph,
+            options,
             is_state_diagram: graph_contains_state_shapes(&graph.statements),
             nodes: HashMap::new(),
             edges: Vec::new(),
@@ -370,7 +438,7 @@ impl<'a> LayoutEngine<'a> {
     }
 
     fn compute_spacing(&self) -> (f64, f64) {
-        (NODE_SEP, RANK_SEP)
+        (self.options.node_spacing, self.options.rank_spacing)
     }
 
     fn subgraph_ids_in_mermaid_order(&self) -> Vec<String> {
@@ -614,11 +682,11 @@ impl<'a> LayoutEngine<'a> {
                 continue;
             }
 
-            let title_padding = if sg.title.is_some() {
-                SUBGRAPH_TITLE_HEIGHT
-            } else {
-                0.0
-            };
+            let title_padding = sg
+                .title
+                .as_deref()
+                .map(|title| self.subgraph_title_height(title))
+                .unwrap_or(0.0);
             let rx = min_x - padding;
             let ry = min_y - padding - title_padding;
             let rw = (max_x - min_x) + padding * 2.0;
@@ -641,6 +709,12 @@ impl<'a> LayoutEngine<'a> {
                     })
             })
             .collect()
+    }
+
+    fn subgraph_title_height(&self, title: &str) -> f64 {
+        let lines = wrap_text_lines(title, self.options.wrapping_width, DEFAULT_CHAR_WIDTH);
+        let (_, text_height) = measure_wrapped_lines(&lines, DEFAULT_CHAR_WIDTH);
+        text_height.max(SUBGRAPH_TITLE_HEIGHT)
     }
 
     /// Returns subgraph IDs in bottom-up order (leaf subgraphs first).
@@ -1254,9 +1328,9 @@ impl<'a> LayoutEngine<'a> {
         } else {
             DEFAULT_CHAR_WIDTH
         };
-        let lines = wrap_text_lines(label, DEFAULT_WRAP_WIDTH, char_width);
+        let lines = wrap_text_lines(label, self.options.wrapping_width, char_width);
         let (text_width, text_height) = measure_wrapped_lines(&lines, char_width);
-        let padding = FLOWCHART_PADDING;
+        let padding = self.options.padding;
         if self.is_state_diagram {
             match shape {
                 NodeShape::RoundedRectangle => {
@@ -1337,7 +1411,7 @@ impl<'a> LayoutEngine<'a> {
         } else {
             DEFAULT_CHAR_WIDTH
         };
-        let lines = wrap_text_lines(label, DEFAULT_WRAP_WIDTH, char_width);
+        let lines = wrap_text_lines(label, self.options.wrapping_width, char_width);
         if lines.is_empty() {
             return None;
         }

@@ -144,12 +144,24 @@ pub fn render_mermaid_to_svg(
 
     let is_flowchart = matches!(diagram_type, Some("graph") | Some("flowchart"));
     if is_flowchart && mermaid_port::is_enabled() {
-        return mermaid_port::render_mermaid_to_svg_ported(mermaid_source, theme);
+        return mermaid_port::render_mermaid_to_svg_ported(
+            mermaid_source,
+            theme,
+            &parsed_source.config,
+        );
     }
 
     let graph = parser::parse_mermaid(mermaid_source)?;
-    let layout_result = layout::compute_layout(&graph);
-    let svg = svg_renderer::render(&layout_result, theme);
+    let layout_result = if is_flowchart {
+        layout::compute_layout_with_config(&graph, &parsed_source.config)
+    } else {
+        layout::compute_layout(&graph)
+    };
+    let svg = if is_flowchart {
+        svg_renderer::render_with_config(&layout_result, theme, &parsed_source.config)
+    } else {
+        svg_renderer::render(&layout_result, theme)
+    };
 
     Ok(svg)
 }
@@ -377,6 +389,29 @@ graph TD
         };
         assert!(svg.contains("background-color: #ffffff"));
         assert!(!svg.contains("background-color: #101010"));
+    }
+
+    #[test]
+    fn test_render_mermaid_to_svg_applies_flowchart_frontmatter_render_config() {
+        let mermaid = r#"---
+config:
+  fontFamily: Inter
+  fontSize: 21px
+  flowchart:
+    curve: linear
+---
+flowchart TD
+    A[Start] --> B[End]"#;
+
+        let result = render_mermaid_to_svg(mermaid, None);
+        let svg = match result {
+            Ok(svg) => svg,
+            Err(err) => panic!("expected ok result, got error: {err}"),
+        };
+        assert!(svg.contains("font-family=\"Inter\""));
+        assert!(svg.contains("font-size=\"21\""));
+        assert!(svg.contains("<path d=\"M"));
+        assert!(svg.contains("L"));
     }
 
     #[test]

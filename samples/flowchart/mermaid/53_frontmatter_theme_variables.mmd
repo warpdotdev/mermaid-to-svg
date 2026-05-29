@@ -1,0 +1,19 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#f8fbff"
+    primaryColor: "#dbeafe"
+    primaryBorderColor: "#2563eb"
+    primaryTextColor: "#0f172a"
+    lineColor: "#7c3aed"
+    clusterBkg: "#f5f3ff"
+    clusterBorder: "#7c3aed"
+---
+flowchart TD
+    Start[Theme variables] --> Process[Custom node colors]
+    Process --> Done[Custom edge color]
+    subgraph StyledCluster[Styled cluster]
+        A[Cluster node A] --> B[Cluster node B]
+    end
+    Done --> StyledCluster

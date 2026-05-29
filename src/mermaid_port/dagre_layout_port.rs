@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::ast::{EdgeStyle, FlowchartGraph, GraphDirection, NodeShape};
+use crate::config::RenderConfig;
 use crate::layout::{LayoutEdge, LayoutNode, LayoutResult, LayoutSubgraph};
 use crate::text_wrap::{
     measure_wrapped_lines, wrap_text_lines, DEFAULT_CHAR_WIDTH, DEFAULT_WRAP_WIDTH,
@@ -43,7 +44,62 @@ struct LocalLayout {
     height: f64,
 }
 
+#[derive(Debug, Clone, Copy)]
+struct PortLayoutOptions {
+    node_spacing: f64,
+    rank_spacing: f64,
+    padding: f64,
+    wrapping_width: f64,
+}
+
+impl Default for PortLayoutOptions {
+    fn default() -> Self {
+        Self {
+            node_spacing: 50.0,
+            rank_spacing: 50.0,
+            padding: FLOWCHART_PADDING,
+            wrapping_width: DEFAULT_WRAP_WIDTH,
+        }
+    }
+}
+
+impl PortLayoutOptions {
+    fn from_render_config(config: &RenderConfig) -> Self {
+        let default = Self::default();
+        Self {
+            node_spacing: config
+                .flowchart
+                .node_spacing
+                .map(f64::from)
+                .unwrap_or(default.node_spacing),
+            rank_spacing: config
+                .flowchart
+                .rank_spacing
+                .map(f64::from)
+                .unwrap_or(default.rank_spacing),
+            padding: config
+                .flowchart
+                .padding
+                .map(f64::from)
+                .unwrap_or(default.padding),
+            wrapping_width: config
+                .flowchart
+                .wrapping_width
+                .map(f64::from)
+                .unwrap_or(default.wrapping_width),
+        }
+    }
+}
+
 pub fn compute_layout_ported(flowchart: &FlowchartGraph) -> LayoutResult {
+    compute_layout_ported_with_config(flowchart, &RenderConfig::default())
+}
+
+pub fn compute_layout_ported_with_config(
+    flowchart: &FlowchartGraph,
+    config: &RenderConfig,
+) -> LayoutResult {
+    let options = PortLayoutOptions::from_render_config(config);
     let db = flow_db::from_flowchart_graph(flowchart);
     let data = flow_data::get_data(&db);
 
@@ -70,7 +126,7 @@ pub fn compute_layout_ported(flowchart: &FlowchartGraph) -> LayoutResult {
         let (width, height) = if node.is_group {
             (0.0, 0.0)
         } else {
-            measure_node(&node.label, node.shape)
+            measure_node(&node.label, node.shape, &options)
         };
 
         node_meta.insert(
@@ -102,8 +158,8 @@ pub fn compute_layout_ported(flowchart: &FlowchartGraph) -> LayoutResult {
         }));
     g.set_graph(GraphConfig {
         rankdir: Some(rankdir.to_string()),
-        nodesep: Some(50.0),
-        ranksep: Some(50.0),
+        nodesep: Some(options.node_spacing as f32),
+        ranksep: Some(options.rank_spacing as f32),
         marginx: Some(8.0),
         marginy: Some(8.0),
         ..Default::default()
@@ -145,7 +201,7 @@ pub fn compute_layout_ported(flowchart: &FlowchartGraph) -> LayoutResult {
             ..Default::default()
         };
         if let Some(label) = &edge.label {
-            if let Some((width, height)) = edge_label_dimensions(label) {
+            if let Some((width, height)) = edge_label_dimensions(label, &options) {
                 edge_label.width = Some(width as f32);
                 edge_label.height = Some(height as f32);
             }
@@ -163,6 +219,7 @@ pub fn compute_layout_ported(flowchart: &FlowchartGraph) -> LayoutResult {
     }
 
     let mut extracted = adjust_clusters_and_edges(&mut g);
+    apply_options_to_extracted(&mut extracted, &options);
 
     let layout = layout_recursive(&mut g, &mut extracted, &node_meta, &edge_meta);
 
@@ -172,6 +229,18 @@ pub fn compute_layout_ported(flowchart: &FlowchartGraph) -> LayoutResult {
         subgraphs: layout.subgraphs,
         width: layout.width,
         height: layout.height,
+    }
+}
+
+fn apply_options_to_extracted(
+    extracted: &mut HashMap<String, ExtractedCluster>,
+    options: &PortLayoutOptions,
+) {
+    for cluster in extracted.values_mut() {
+        let graph_config = cluster.graph.graph_mut();
+        graph_config.nodesep = Some(options.node_spacing as f32);
+        graph_config.ranksep = Some(options.rank_spacing as f32);
+        apply_options_to_extracted(&mut cluster.children, options);
     }
 }
 
@@ -341,10 +410,10 @@ fn shift_layout(layout: &mut LocalLayout, dx: f64, dy: f64) {
     }
 }
 
-fn measure_node(label: &str, shape: NodeShape) -> (f64, f64) {
-    let lines = wrap_text_lines(label, DEFAULT_WRAP_WIDTH, DEFAULT_CHAR_WIDTH);
+fn measure_node(label: &str, shape: NodeShape, options: &PortLayoutOptions) -> (f64, f64) {
+    let lines = wrap_text_lines(label, options.wrapping_width, DEFAULT_CHAR_WIDTH);
     let (text_width, text_height) = measure_wrapped_lines(&lines, DEFAULT_CHAR_WIDTH);
-    let padding = FLOWCHART_PADDING;
+    let padding = options.padding;
 
     match shape {
         NodeShape::Rectangle => (text_width + padding * 4.0, text_height + padding * 2.0),
@@ -392,12 +461,12 @@ fn measure_node(label: &str, shape: NodeShape) -> (f64, f64) {
     }
 }
 
-fn edge_label_dimensions(label: &str) -> Option<(f64, f64)> {
+fn edge_label_dimensions(label: &str, options: &PortLayoutOptions) -> Option<(f64, f64)> {
     if label.trim().is_empty() {
         return None;
     }
 
-    let lines = wrap_text_lines(label, DEFAULT_WRAP_WIDTH, DEFAULT_CHAR_WIDTH);
+    let lines = wrap_text_lines(label, options.wrapping_width, DEFAULT_CHAR_WIDTH);
     if lines.is_empty() {
         return None;
     }
@@ -406,4 +475,66 @@ fn edge_label_dimensions(label: &str) -> Option<(f64, f64)> {
     let width = text_width + EDGE_LABEL_PADDING * 2.0;
     let height = text_height + EDGE_LABEL_PADDING * 2.0;
     Some((width, height))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ast::{Edge, FlowchartGraph, GraphDirection, Statement};
+    use crate::config::FlowchartConfig;
+
+    #[test]
+    fn ported_layout_uses_spacing_config() {
+        let graph = FlowchartGraph {
+            direction: GraphDirection::TopToBottom,
+            statements: vec![Statement::Edge(Edge {
+                from: "A".to_string(),
+                to: "B".to_string(),
+                label: None,
+                style: EdgeStyle::Arrow,
+            })],
+        };
+
+        let default_layout = compute_layout_ported(&graph);
+        let config = RenderConfig {
+            flowchart: FlowchartConfig {
+                rank_spacing: Some(140),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let configured_layout = compute_layout_ported_with_config(&graph, &config);
+
+        let default_delta = default_layout.nodes["B"].y - default_layout.nodes["A"].y;
+        let configured_delta = configured_layout.nodes["B"].y - configured_layout.nodes["A"].y;
+
+        assert!(configured_delta > default_delta);
+    }
+
+    #[test]
+    fn ported_layout_uses_padding_and_wrapping_config() {
+        let default = PortLayoutOptions::default();
+        let config = RenderConfig {
+            flowchart: FlowchartConfig {
+                padding: Some(4),
+                wrapping_width: Some(70),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let configured = PortLayoutOptions::from_render_config(&config);
+        let default_size = measure_node(
+            "Long label that wraps across several rendered lines",
+            NodeShape::Rectangle,
+            &default,
+        );
+        let configured_size = measure_node(
+            "Long label that wraps across several rendered lines",
+            NodeShape::Rectangle,
+            &configured,
+        );
+
+        assert!(configured_size.1 > default_size.1);
+        assert!(configured_size.0 < default_size.0);
+    }
 }
