@@ -3,7 +3,8 @@ use std::collections::{HashMap, HashSet};
 use crate::ast::{EdgeStyle, FlowchartGraph, GraphDirection, Node, NodeShape, Statement};
 use crate::config::RenderConfig;
 use crate::text_wrap::{
-    measure_wrapped_lines, wrap_text_lines, DEFAULT_CHAR_WIDTH, DEFAULT_WRAP_WIDTH,
+    measure_wrapped_lines_with_font_size, scale_char_width, wrap_text_lines, DEFAULT_CHAR_WIDTH,
+    DEFAULT_FONT_SIZE, DEFAULT_WRAP_WIDTH,
 };
 use dagre_rust::layout::layout as dagre_layout;
 use dagre_rust::{GraphConfig, GraphEdge, GraphNode};
@@ -178,6 +179,7 @@ struct FlowchartLayoutOptions {
     rank_spacing: f64,
     padding: f64,
     wrapping_width: f64,
+    font_size: f64,
 }
 
 impl Default for FlowchartLayoutOptions {
@@ -187,6 +189,7 @@ impl Default for FlowchartLayoutOptions {
             rank_spacing: RANK_SEP,
             padding: FLOWCHART_PADDING,
             wrapping_width: DEFAULT_WRAP_WIDTH,
+            font_size: DEFAULT_FONT_SIZE,
         }
     }
 }
@@ -215,6 +218,7 @@ impl FlowchartLayoutOptions {
                 .wrapping_width
                 .map(f64::from)
                 .unwrap_or(default.wrapping_width),
+            font_size: config.font_size_px().unwrap_or(default.font_size),
         }
     }
 }
@@ -712,8 +716,10 @@ impl<'a> LayoutEngine<'a> {
     }
 
     fn subgraph_title_height(&self, title: &str) -> f64 {
-        let lines = wrap_text_lines(title, self.options.wrapping_width, DEFAULT_CHAR_WIDTH);
-        let (_, text_height) = measure_wrapped_lines(&lines, DEFAULT_CHAR_WIDTH);
+        let char_width = scale_char_width(DEFAULT_CHAR_WIDTH, self.options.font_size);
+        let lines = wrap_text_lines(title, self.options.wrapping_width, char_width);
+        let (_, text_height) =
+            measure_wrapped_lines_with_font_size(&lines, char_width, self.options.font_size);
         text_height.max(SUBGRAPH_TITLE_HEIGHT)
     }
 
@@ -1324,12 +1330,13 @@ impl<'a> LayoutEngine<'a> {
     /// Sources: packages/mermaid/src/rendering-util/rendering-elements/shapes/*.ts (question, hexagon, stadium, cylinder, subroutine, rect_left_inv_arrow, circle).
     fn measure_node(&self, label: &str, shape: NodeShape) -> (f64, f64) {
         let char_width = if self.is_state_diagram {
-            STATE_CHAR_WIDTH
+            scale_char_width(STATE_CHAR_WIDTH, self.options.font_size)
         } else {
-            DEFAULT_CHAR_WIDTH
+            scale_char_width(DEFAULT_CHAR_WIDTH, self.options.font_size)
         };
         let lines = wrap_text_lines(label, self.options.wrapping_width, char_width);
-        let (text_width, text_height) = measure_wrapped_lines(&lines, char_width);
+        let (text_width, text_height) =
+            measure_wrapped_lines_with_font_size(&lines, char_width, self.options.font_size);
         let padding = self.options.padding;
         if self.is_state_diagram {
             match shape {
@@ -1407,15 +1414,16 @@ impl<'a> LayoutEngine<'a> {
             return None;
         }
         let char_width = if self.is_state_diagram {
-            STATE_CHAR_WIDTH
+            scale_char_width(STATE_CHAR_WIDTH, self.options.font_size)
         } else {
-            DEFAULT_CHAR_WIDTH
+            scale_char_width(DEFAULT_CHAR_WIDTH, self.options.font_size)
         };
         let lines = wrap_text_lines(label, self.options.wrapping_width, char_width);
         if lines.is_empty() {
             return None;
         }
-        let (text_width, text_height) = measure_wrapped_lines(&lines, char_width);
+        let (text_width, text_height) =
+            measure_wrapped_lines_with_font_size(&lines, char_width, self.options.font_size);
         let width = text_width + EDGE_LABEL_PADDING * 2.0;
         let height = text_height + EDGE_LABEL_PADDING * 2.0;
         Some((width, height))

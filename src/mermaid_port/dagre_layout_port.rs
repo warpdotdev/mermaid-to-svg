@@ -4,7 +4,8 @@ use crate::ast::{EdgeStyle, FlowchartGraph, GraphDirection, NodeShape};
 use crate::config::RenderConfig;
 use crate::layout::{LayoutEdge, LayoutNode, LayoutResult, LayoutSubgraph};
 use crate::text_wrap::{
-    measure_wrapped_lines, wrap_text_lines, DEFAULT_CHAR_WIDTH, DEFAULT_WRAP_WIDTH,
+    measure_wrapped_lines_with_font_size, scale_char_width, wrap_text_lines, DEFAULT_CHAR_WIDTH,
+    DEFAULT_FONT_SIZE, DEFAULT_WRAP_WIDTH,
 };
 use dagre_rust::layout::layout as dagre_layout;
 use dagre_rust::{GraphConfig, GraphEdge, GraphNode};
@@ -50,6 +51,7 @@ struct PortLayoutOptions {
     rank_spacing: f64,
     padding: f64,
     wrapping_width: f64,
+    font_size: f64,
 }
 
 impl Default for PortLayoutOptions {
@@ -59,6 +61,7 @@ impl Default for PortLayoutOptions {
             rank_spacing: 50.0,
             padding: FLOWCHART_PADDING,
             wrapping_width: DEFAULT_WRAP_WIDTH,
+            font_size: DEFAULT_FONT_SIZE,
         }
     }
 }
@@ -87,6 +90,7 @@ impl PortLayoutOptions {
                 .wrapping_width
                 .map(f64::from)
                 .unwrap_or(default.wrapping_width),
+            font_size: config.font_size_px().unwrap_or(default.font_size),
         }
     }
 }
@@ -411,8 +415,10 @@ fn shift_layout(layout: &mut LocalLayout, dx: f64, dy: f64) {
 }
 
 fn measure_node(label: &str, shape: NodeShape, options: &PortLayoutOptions) -> (f64, f64) {
-    let lines = wrap_text_lines(label, options.wrapping_width, DEFAULT_CHAR_WIDTH);
-    let (text_width, text_height) = measure_wrapped_lines(&lines, DEFAULT_CHAR_WIDTH);
+    let char_width = scale_char_width(DEFAULT_CHAR_WIDTH, options.font_size);
+    let lines = wrap_text_lines(label, options.wrapping_width, char_width);
+    let (text_width, text_height) =
+        measure_wrapped_lines_with_font_size(&lines, char_width, options.font_size);
     let padding = options.padding;
 
     match shape {
@@ -466,12 +472,14 @@ fn edge_label_dimensions(label: &str, options: &PortLayoutOptions) -> Option<(f6
         return None;
     }
 
-    let lines = wrap_text_lines(label, options.wrapping_width, DEFAULT_CHAR_WIDTH);
+    let char_width = scale_char_width(DEFAULT_CHAR_WIDTH, options.font_size);
+    let lines = wrap_text_lines(label, options.wrapping_width, char_width);
     if lines.is_empty() {
         return None;
     }
 
-    let (text_width, text_height) = measure_wrapped_lines(&lines, DEFAULT_CHAR_WIDTH);
+    let (text_width, text_height) =
+        measure_wrapped_lines_with_font_size(&lines, char_width, options.font_size);
     let width = text_width + EDGE_LABEL_PADDING * 2.0;
     let height = text_height + EDGE_LABEL_PADDING * 2.0;
     Some((width, height))
@@ -536,5 +544,26 @@ mod tests {
 
         assert!(configured_size.1 > default_size.1);
         assert!(configured_size.0 < default_size.0);
+    }
+
+    #[test]
+    fn ported_layout_uses_font_size_config() {
+        let default = PortLayoutOptions::default();
+        let config = RenderConfig {
+            font_size: Some("32px".to_string()),
+            ..Default::default()
+        };
+        let configured = PortLayoutOptions::from_render_config(&config);
+        let default_size = measure_node("Font", NodeShape::Rectangle, &default);
+        let configured_size = measure_node("Font", NodeShape::Rectangle, &configured);
+        let (default_label_width, default_label_height) =
+            edge_label_dimensions("Edge", &default).expect("label should have dimensions");
+        let (configured_label_width, configured_label_height) =
+            edge_label_dimensions("Edge", &configured).expect("label should have dimensions");
+
+        assert!(configured_size.0 > default_size.0);
+        assert!(configured_size.1 > default_size.1);
+        assert!(configured_label_width > default_label_width);
+        assert!(configured_label_height > default_label_height);
     }
 }

@@ -2,8 +2,9 @@ use crate::ast::{EdgeStyle, NodeShape};
 use crate::config::RenderConfig;
 use crate::layout::{LayoutEdge, LayoutNode, LayoutResult, LayoutSubgraph};
 use crate::text_wrap::{
-    line_width_words, measure_wrapped_lines, wrap_text_lines, wrapped_text_height,
-    DEFAULT_CHAR_WIDTH, DEFAULT_FONT_SIZE, DEFAULT_LINE_HEIGHT, DEFAULT_WRAP_WIDTH,
+    line_width_words, measure_wrapped_lines_with_font_size, scale_char_width, wrap_text_lines,
+    wrapped_text_height_with_font_size, DEFAULT_CHAR_WIDTH, DEFAULT_FONT_SIZE, DEFAULT_LINE_HEIGHT,
+    DEFAULT_WRAP_WIDTH,
 };
 use crate::theme::MermaidTheme;
 
@@ -77,11 +78,7 @@ impl SvgRenderOptions {
         let default = Self::default();
         Self {
             font_family: config.font_family.clone().unwrap_or(default.font_family),
-            font_size: config
-                .font_size
-                .as_deref()
-                .and_then(parse_font_size)
-                .unwrap_or(default.font_size),
+            font_size: config.font_size_px().unwrap_or(default.font_size),
             wrapping_width: config
                 .flowchart
                 .wrapping_width
@@ -105,15 +102,6 @@ impl EdgeCurve {
             Self::Basis
         }
     }
-}
-
-fn parse_font_size(value: &str) -> Option<f64> {
-    let trimmed = value.trim();
-    let numeric = trimmed.strip_suffix("px").unwrap_or(trimmed).trim();
-    numeric
-        .parse::<f64>()
-        .ok()
-        .filter(|size| size.is_finite() && *size > 0.0)
 }
 
 struct SvgRenderer<'a> {
@@ -211,11 +199,13 @@ impl<'a> SvgRenderer<'a> {
 
     fn render_subgraph_title(&mut self, subgraph: &LayoutSubgraph) {
         if let Some(title) = &subgraph.title {
-            let lines = wrap_text_lines(title, self.options.wrapping_width, DEFAULT_CHAR_WIDTH);
+            let char_width = scale_char_width(DEFAULT_CHAR_WIDTH, self.options.font_size);
+            let lines = wrap_text_lines(title, self.options.wrapping_width, char_width);
             if lines.is_empty() {
                 return;
             }
-            let (_, text_height) = measure_wrapped_lines(&lines, DEFAULT_CHAR_WIDTH);
+            let (_, text_height) =
+                measure_wrapped_lines_with_font_size(&lines, char_width, self.options.font_size);
             let title_x = subgraph.x + subgraph.width / 2.0;
             let title_y = subgraph.y + SUBGRAPH_TITLE_TOP_MARGIN + text_height / 2.0;
             self.render_text_lines(
@@ -501,9 +491,9 @@ impl<'a> SvgRenderer<'a> {
 
     fn render_text(&mut self, x: f64, y: f64, text: &str) {
         let char_width = if self.is_state_diagram {
-            STATE_CHAR_WIDTH
+            scale_char_width(STATE_CHAR_WIDTH, self.options.font_size)
         } else {
-            DEFAULT_CHAR_WIDTH
+            scale_char_width(DEFAULT_CHAR_WIDTH, self.options.font_size)
         };
         let lines = wrap_text_lines(text, self.options.wrapping_width, char_width);
         if lines.is_empty() {
@@ -812,9 +802,9 @@ impl<'a> SvgRenderer<'a> {
 
         let mut labels: Vec<LabelInfo> = Vec::new();
         let char_width = if self.is_state_diagram {
-            STATE_CHAR_WIDTH
+            scale_char_width(STATE_CHAR_WIDTH, self.options.font_size)
         } else {
-            EDGE_LABEL_CHAR_WIDTH
+            scale_char_width(EDGE_LABEL_CHAR_WIDTH, self.options.font_size)
         };
         for edge in edges {
             let Some(label) = &edge.label else {
@@ -845,7 +835,8 @@ impl<'a> SvgRenderer<'a> {
                 .iter()
                 .map(|line| line_width_words(line, char_width))
                 .fold(0.0, f64::max);
-            let total_height = wrapped_text_height(lines.len());
+            let total_height =
+                wrapped_text_height_with_font_size(lines.len(), self.options.font_size);
             let rect_width = max_line_width + EDGE_LABEL_PADDING_H * 2.0;
             let rect_height = total_height + EDGE_LABEL_PADDING_V * 2.0;
 

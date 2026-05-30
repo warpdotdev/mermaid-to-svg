@@ -20,8 +20,11 @@ pub struct MermaidFrontmatter {
 pub struct RenderConfig {
     pub theme: Option<MermaidThemePreset>,
     pub theme_variables: MermaidThemeVariables,
+    /// Parsed for Mermaid frontmatter compatibility, but not currently rendered.
     pub layout: Option<String>,
+    /// Parsed for Mermaid frontmatter compatibility, but not currently rendered.
     pub look: Option<String>,
+    /// Parsed for Mermaid frontmatter compatibility, but not currently rendered.
     pub security_level: Option<String>,
     pub font_family: Option<String>,
     pub font_size: Option<String>,
@@ -31,13 +34,17 @@ pub struct RenderConfig {
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct FlowchartConfig {
     pub curve: Option<String>,
+    /// Parsed for Mermaid frontmatter compatibility, but not currently rendered.
     pub html_labels: Option<bool>,
     pub node_spacing: Option<u32>,
     pub rank_spacing: Option<u32>,
     pub padding: Option<u32>,
+    /// Parsed for Mermaid frontmatter compatibility, but not currently rendered.
     pub diagram_padding: Option<u32>,
     pub wrapping_width: Option<u32>,
+    /// Parsed for Mermaid frontmatter compatibility, but not currently rendered.
     pub use_max_width: Option<bool>,
+    /// Parsed for Mermaid frontmatter compatibility, but not currently rendered.
     pub default_renderer: Option<String>,
 }
 
@@ -50,6 +57,10 @@ impl RenderConfig {
         let mut theme = self.theme.unwrap_or(MermaidThemePreset::Default).to_theme();
         self.theme_variables.apply_to(&mut theme);
         Some(theme)
+    }
+
+    pub fn font_size_px(&self) -> Option<f64> {
+        self.font_size.as_deref().and_then(parse_font_size)
     }
 }
 
@@ -187,6 +198,15 @@ fn value_to_u32(value: &Value) -> Option<u32> {
         Value::String(value) => value.parse().ok(),
         _ => None,
     }
+}
+
+fn parse_font_size(value: &str) -> Option<f64> {
+    let trimmed = value.trim();
+    let numeric = trimmed.strip_suffix("px").unwrap_or(trimmed).trim();
+    numeric
+        .parse::<f64>()
+        .ok()
+        .filter(|size| size.is_finite() && *size > 0.0)
 }
 
 fn frontmatter_bounds(source: &str) -> Option<(usize, usize, usize)> {

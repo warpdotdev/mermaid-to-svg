@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::{LayoutEngine, LayoutNode};
+use super::{FlowchartLayoutOptions, LayoutEngine, LayoutNode};
 use crate::ast::{Edge, EdgeStyle, FlowchartGraph, GraphDirection, Node, NodeShape, Statement};
 use crate::config::{FlowchartConfig, RenderConfig};
 use crate::layout::{compute_layout, compute_layout_with_config};
@@ -83,6 +83,43 @@ fn test_flowchart_padding_and_wrapping_config_affect_node_size() {
 
     assert!(configured_node.height > default_node.height);
     assert!(configured_node.width < default_node.width);
+}
+#[test]
+fn test_flowchart_font_size_config_affects_node_and_edge_label_size() {
+    let graph = FlowchartGraph {
+        direction: GraphDirection::TopToBottom,
+        statements: vec![Statement::Node(Node {
+            id: "A".to_string(),
+            label: Some("Font".to_string()),
+            shape: NodeShape::Rectangle,
+        })],
+    };
+
+    let default_layout = compute_layout(&graph);
+    let config = RenderConfig {
+        font_size: Some("32px".to_string()),
+        ..Default::default()
+    };
+    let configured_layout = compute_layout_with_config(&graph, &config);
+
+    let default_node = &default_layout.nodes["A"];
+    let configured_node = &configured_layout.nodes["A"];
+
+    assert!(configured_node.width > default_node.width);
+    assert!(configured_node.height > default_node.height);
+
+    let default_engine = LayoutEngine::new(&graph);
+    let configured_engine =
+        LayoutEngine::new_with_options(&graph, FlowchartLayoutOptions::from_render_config(&config));
+    let (default_label_width, default_label_height) = default_engine
+        .edge_label_dimensions("Edge")
+        .expect("label should have dimensions");
+    let (configured_label_width, configured_label_height) = configured_engine
+        .edge_label_dimensions("Edge")
+        .expect("label should have dimensions");
+
+    assert!(configured_label_width > default_label_width);
+    assert!(configured_label_height > default_label_height);
 }
 
 #[test]
