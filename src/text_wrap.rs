@@ -5,7 +5,6 @@ pub const DEFAULT_LINE_HEIGHT: f64 = 1.1;
 pub const DEFAULT_WRAP_WIDTH: f64 = 200.0;
 pub const DEFAULT_CHAR_WIDTH: f64 = 8.0;
 pub const DEFAULT_TEXT_HEIGHT: f64 = 24.0;
-pub const DEFAULT_LINE_SPACING: f64 = DEFAULT_FONT_SIZE * DEFAULT_LINE_HEIGHT;
 
 /// Mirrors mermaid.js splitText.ts splitLineToFitWidth behavior for non-markdown labels.
 /// Source: packages/mermaid/src/rendering-util/splitText.ts.
@@ -43,20 +42,41 @@ pub fn line_width(line: &str, char_width: f64) -> f64 {
     grapheme_count * char_width
 }
 
-/// Computes max line width and total height using wrapped lines.
-pub fn measure_wrapped_lines(lines: &[Vec<String>], char_width: f64) -> (f64, f64) {
+pub fn measure_wrapped_lines_with_font_size(
+    lines: &[Vec<String>],
+    char_width: f64,
+    font_size: f64,
+) -> (f64, f64) {
     let max_width = lines
         .iter()
         .map(|line| line_width_words(line, char_width))
         .fold(0.0, f64::max);
-    (max_width, wrapped_text_height(lines.len()))
+    (
+        max_width,
+        wrapped_text_height_with_font_size(lines.len(), font_size),
+    )
 }
 
-pub fn wrapped_text_height(line_count: usize) -> f64 {
+pub fn wrapped_text_height_with_font_size(line_count: usize, font_size: f64) -> f64 {
     if line_count == 0 {
         return 0.0;
     }
-    DEFAULT_TEXT_HEIGHT + (line_count.saturating_sub(1)) as f64 * DEFAULT_LINE_SPACING
+    let font_size = normalized_font_size(font_size);
+    let text_height = DEFAULT_TEXT_HEIGHT * font_size / DEFAULT_FONT_SIZE;
+    let line_spacing = font_size * DEFAULT_LINE_HEIGHT;
+    text_height + (line_count.saturating_sub(1)) as f64 * line_spacing
+}
+
+pub fn scale_char_width(char_width: f64, font_size: f64) -> f64 {
+    char_width * normalized_font_size(font_size) / DEFAULT_FONT_SIZE
+}
+
+fn normalized_font_size(font_size: f64) -> f64 {
+    if font_size.is_finite() && font_size > 0.0 {
+        font_size
+    } else {
+        DEFAULT_FONT_SIZE
+    }
 }
 fn split_line_to_words(text: &str) -> Vec<String> {
     let mut words = Vec::new();

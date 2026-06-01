@@ -1,8 +1,10 @@
 use crate::ast::{EdgeStyle, NodeShape};
+use crate::config::RenderConfig;
 use crate::layout::{LayoutEdge, LayoutNode, LayoutResult, LayoutSubgraph};
 use crate::text_wrap::{
-    line_width_words, measure_wrapped_lines, wrap_text_lines, wrapped_text_height,
-    DEFAULT_CHAR_WIDTH, DEFAULT_FONT_SIZE, DEFAULT_LINE_HEIGHT, DEFAULT_WRAP_WIDTH,
+    line_width_words, measure_wrapped_lines_with_font_size, scale_char_width, wrap_text_lines,
+    wrapped_text_height_with_font_size, DEFAULT_CHAR_WIDTH, DEFAULT_FONT_SIZE, DEFAULT_LINE_HEIGHT,
+    DEFAULT_WRAP_WIDTH,
 };
 use crate::theme::MermaidTheme;
 
@@ -13,27 +15,93 @@ use crate::theme::MermaidTheme;
 const EDGE_ARROWHEAD_OFFSET: f64 = 4.0;
 const EDGE_ARROWHEAD_OFFSET_THICK: f64 = 5.5; // markerWidth 11 × (10−5)/10
 
-const EDGE_LABEL_MAX_WIDTH: f64 = DEFAULT_WRAP_WIDTH;
 const EDGE_LABEL_CHAR_WIDTH: f64 = DEFAULT_CHAR_WIDTH;
-const EDGE_LABEL_LINE_HEIGHT: f64 = DEFAULT_LINE_HEIGHT;
-const EDGE_LABEL_FONT_SIZE: f64 = DEFAULT_FONT_SIZE;
 const EDGE_LABEL_PADDING_H: f64 = 2.0;
 const EDGE_LABEL_PADDING_V: f64 = 2.0;
-const NODE_LABEL_FONT_SIZE: f64 = DEFAULT_FONT_SIZE;
-const NODE_LABEL_LINE_HEIGHT: f64 = DEFAULT_LINE_HEIGHT;
 const EDGE_LABEL_BG_OPACITY: f64 = 0.8;
 const SUBGRAPH_TITLE_TOP_MARGIN: f64 = 0.0;
 const STATE_CHAR_WIDTH: f64 = 6.7;
+const DEFAULT_FONT_FAMILY: &str = "Trebuchet MS, verdana, arial, sans-serif";
 
 pub fn render(layout: &LayoutResult, theme: &MermaidTheme) -> String {
+    render_with_config(layout, theme, &RenderConfig::default())
+}
+
+pub fn render_with_config(
+    layout: &LayoutResult,
+    theme: &MermaidTheme,
+    config: &RenderConfig,
+) -> String {
     let is_state_diagram = layout.nodes.values().any(|node| {
         matches!(
             node.shape,
             NodeShape::StartState | NodeShape::EndState | NodeShape::ForkJoin
         )
     });
-    let mut svg = SvgRenderer::new(layout.width, layout.height, theme, is_state_diagram);
+    let mut svg = SvgRenderer::new(
+        layout.width,
+        layout.height,
+        theme,
+        is_state_diagram,
+        SvgRenderOptions::from_render_config(config),
+    );
     svg.render(layout)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum EdgeCurve {
+    Basis,
+    Linear,
+}
+
+#[derive(Debug, Clone)]
+struct SvgRenderOptions {
+    font_family: String,
+    font_size: f64,
+    wrapping_width: f64,
+    edge_curve: EdgeCurve,
+}
+
+impl Default for SvgRenderOptions {
+    fn default() -> Self {
+        Self {
+            font_family: DEFAULT_FONT_FAMILY.to_string(),
+            font_size: DEFAULT_FONT_SIZE,
+            wrapping_width: DEFAULT_WRAP_WIDTH,
+            edge_curve: EdgeCurve::Basis,
+        }
+    }
+}
+
+impl SvgRenderOptions {
+    fn from_render_config(config: &RenderConfig) -> Self {
+        let default = Self::default();
+        Self {
+            font_family: config.font_family.clone().unwrap_or(default.font_family),
+            font_size: config.font_size_px().unwrap_or(default.font_size),
+            wrapping_width: config
+                .flowchart
+                .wrapping_width
+                .map(f64::from)
+                .unwrap_or(default.wrapping_width),
+            edge_curve: config
+                .flowchart
+                .curve
+                .as_deref()
+                .map(EdgeCurve::from_mermaid_name)
+                .unwrap_or(default.edge_curve),
+        }
+    }
+}
+
+impl EdgeCurve {
+    fn from_mermaid_name(name: &str) -> Self {
+        if name.eq_ignore_ascii_case("linear") {
+            Self::Linear
+        } else {
+            Self::Basis
+        }
+    }
 }
 
 struct SvgRenderer<'a> {
@@ -41,16 +109,24 @@ struct SvgRenderer<'a> {
     height: f64,
     theme: &'a MermaidTheme,
     is_state_diagram: bool,
+    options: SvgRenderOptions,
     output: String,
 }
 
 impl<'a> SvgRenderer<'a> {
-    fn new(width: f64, height: f64, theme: &'a MermaidTheme, is_state_diagram: bool) -> Self {
+    fn new(
+        width: f64,
+        height: f64,
+        theme: &'a MermaidTheme,
+        is_state_diagram: bool,
+        options: SvgRenderOptions,
+    ) -> Self {
         Self {
             width,
             height,
             theme,
             is_state_diagram,
+            options,
             output: String::new(),
         }
     }
@@ -123,19 +199,21 @@ impl<'a> SvgRenderer<'a> {
 
     fn render_subgraph_title(&mut self, subgraph: &LayoutSubgraph) {
         if let Some(title) = &subgraph.title {
-            let lines = wrap_text_lines(title, DEFAULT_WRAP_WIDTH, DEFAULT_CHAR_WIDTH);
+            let char_width = scale_char_width(DEFAULT_CHAR_WIDTH, self.options.font_size);
+            let lines = wrap_text_lines(title, self.options.wrapping_width, char_width);
             if lines.is_empty() {
                 return;
             }
-            let (_, text_height) = measure_wrapped_lines(&lines, DEFAULT_CHAR_WIDTH);
+            let (_, text_height) =
+                measure_wrapped_lines_with_font_size(&lines, char_width, self.options.font_size);
             let title_x = subgraph.x + subgraph.width / 2.0;
             let title_y = subgraph.y + SUBGRAPH_TITLE_TOP_MARGIN + text_height / 2.0;
             self.render_text_lines(
                 title_x,
                 title_y,
                 &lines,
-                NODE_LABEL_FONT_SIZE,
-                NODE_LABEL_LINE_HEIGHT,
+                self.options.font_size,
+                DEFAULT_LINE_HEIGHT,
                 &self.theme.text_color,
             );
         }
@@ -413,11 +491,11 @@ impl<'a> SvgRenderer<'a> {
 
     fn render_text(&mut self, x: f64, y: f64, text: &str) {
         let char_width = if self.is_state_diagram {
-            STATE_CHAR_WIDTH
+            scale_char_width(STATE_CHAR_WIDTH, self.options.font_size)
         } else {
-            DEFAULT_CHAR_WIDTH
+            scale_char_width(DEFAULT_CHAR_WIDTH, self.options.font_size)
         };
-        let lines = wrap_text_lines(text, DEFAULT_WRAP_WIDTH, char_width);
+        let lines = wrap_text_lines(text, self.options.wrapping_width, char_width);
         if lines.is_empty() {
             return;
         }
@@ -425,8 +503,8 @@ impl<'a> SvgRenderer<'a> {
             x,
             y,
             &lines,
-            NODE_LABEL_FONT_SIZE,
-            NODE_LABEL_LINE_HEIGHT,
+            self.options.font_size,
+            DEFAULT_LINE_HEIGHT,
             &self.theme.text_color,
         );
     }
@@ -445,10 +523,11 @@ impl<'a> SvgRenderer<'a> {
         // center of the text glyph. We distribute n lines evenly around the center y.
         let start_y = y - (lines.len() as f64 - 1.0) * line_height_px / 2.0;
 
+        let font_family = Self::escape_xml(&self.options.font_family);
         self.output.push_str(&format!(
-            r#"<text text-anchor="middle" dominant-baseline="central" font-family="Trebuchet MS, verdana, arial, sans-serif" font-size="{:.0}" fill="{}">
+            r#"<text text-anchor="middle" dominant-baseline="central" font-family="{}" font-size="{:.0}" fill="{}">
 "#,
-            font_size, color
+            font_family, font_size, color
         ));
 
         for (i, line) in lines.iter().enumerate() {
@@ -503,8 +582,7 @@ impl<'a> SvgRenderer<'a> {
             Self::shorten_end_for_marker(&mut points, offset);
         }
 
-        let points = Self::fix_corners(&points);
-        let d = Self::basis_spline_path_d(&points);
+        let d = self.edge_path_d(&points);
 
         self.output.push_str(&format!(
             r#"<path d="{}" fill="none" stroke="{}" stroke-width="{:.1}" stroke-linecap="round" stroke-linejoin="round"{}{}/>
@@ -532,6 +610,27 @@ impl<'a> SvgRenderer<'a> {
         let ux = dx / len;
         let uy = dy / len;
         points[last_idx] = (last.0 - ux * offset, last.1 - uy * offset);
+    }
+
+    fn edge_path_d(&self, points: &[(f64, f64)]) -> String {
+        match self.options.edge_curve {
+            EdgeCurve::Basis => {
+                let points = Self::fix_corners(points);
+                Self::basis_spline_path_d(&points)
+            }
+            EdgeCurve::Linear => Self::linear_path_d(points),
+        }
+    }
+
+    fn linear_path_d(points: &[(f64, f64)]) -> String {
+        let Some((first_x, first_y)) = points.first().copied() else {
+            return String::new();
+        };
+        let mut d = format!("M{first_x:.1},{first_y:.1}");
+        for (x, y) in points.iter().skip(1) {
+            d.push_str(&format!("L{x:.1},{y:.1}"));
+        }
+        d
     }
 
     fn basis_spline_path_d(points: &[(f64, f64)]) -> String {
@@ -703,9 +802,9 @@ impl<'a> SvgRenderer<'a> {
 
         let mut labels: Vec<LabelInfo> = Vec::new();
         let char_width = if self.is_state_diagram {
-            STATE_CHAR_WIDTH
+            scale_char_width(STATE_CHAR_WIDTH, self.options.font_size)
         } else {
-            EDGE_LABEL_CHAR_WIDTH
+            scale_char_width(EDGE_LABEL_CHAR_WIDTH, self.options.font_size)
         };
         for edge in edges {
             let Some(label) = &edge.label else {
@@ -727,7 +826,7 @@ impl<'a> SvgRenderer<'a> {
                 Self::label_position(&label_points)
             };
 
-            let lines = wrap_text_lines(label, EDGE_LABEL_MAX_WIDTH, char_width);
+            let lines = wrap_text_lines(label, self.options.wrapping_width, char_width);
             if lines.is_empty() {
                 continue;
             }
@@ -736,7 +835,8 @@ impl<'a> SvgRenderer<'a> {
                 .iter()
                 .map(|line| line_width_words(line, char_width))
                 .fold(0.0, f64::max);
-            let total_height = wrapped_text_height(lines.len());
+            let total_height =
+                wrapped_text_height_with_font_size(lines.len(), self.options.font_size);
             let rect_width = max_line_width + EDGE_LABEL_PADDING_H * 2.0;
             let rect_height = total_height + EDGE_LABEL_PADDING_V * 2.0;
 
@@ -820,8 +920,8 @@ impl<'a> SvgRenderer<'a> {
                 info.x,
                 info.y,
                 &info.lines,
-                EDGE_LABEL_FONT_SIZE,
-                EDGE_LABEL_LINE_HEIGHT,
+                self.options.font_size,
+                DEFAULT_LINE_HEIGHT,
                 &self.theme.text_color,
             );
         }

@@ -1,7 +1,9 @@
+use std::borrow::Cow;
 mod ast;
 mod block_diagram;
 mod c4_diagram;
 mod class_diagram;
+pub mod config;
 mod er_diagram;
 mod error;
 pub mod fixtures;
@@ -31,15 +33,22 @@ mod xychart_diagram;
 #[cfg(test)]
 mod reference_svg;
 
+pub use config::{parse_mermaid_frontmatter, FlowchartConfig, ParsedMermaidSource, RenderConfig};
 pub use error::MermaidError;
-pub use theme::MermaidTheme;
+pub use theme::{MermaidTheme, MermaidThemePreset, MermaidThemeVariables};
 
 pub fn render_mermaid_to_svg(
     mermaid_source: &str,
     theme: Option<&MermaidTheme>,
 ) -> Result<String, MermaidError> {
+    let parsed_source = parse_mermaid_frontmatter(mermaid_source);
     let default_theme = MermaidTheme::default();
-    let theme = theme.unwrap_or(&default_theme);
+    let configured_theme = parsed_source.config.to_mermaid_theme();
+    let theme = match theme {
+        Some(theme) => theme,
+        None => configured_theme.as_ref().unwrap_or(&default_theme),
+    };
+    let mermaid_source = parsed_source.body.as_ref();
 
     let diagram_type = first_diagram_type_token(mermaid_source);
 
@@ -135,14 +144,35 @@ pub fn render_mermaid_to_svg(
 
     let is_flowchart = matches!(diagram_type, Some("graph") | Some("flowchart"));
     if is_flowchart && mermaid_port::is_enabled() {
-        return mermaid_port::render_mermaid_to_svg_ported(mermaid_source, theme);
+        return mermaid_port::render_mermaid_to_svg_ported(
+            mermaid_source,
+            theme,
+            &parsed_source.config,
+        );
     }
 
     let graph = parser::parse_mermaid(mermaid_source)?;
-    let layout_result = layout::compute_layout(&graph);
-    let svg = svg_renderer::render(&layout_result, theme);
+    let layout_result = if is_flowchart {
+        layout::compute_layout_with_config(&graph, &parsed_source.config)
+    } else {
+        layout::compute_layout(&graph)
+    };
+    let svg = if is_flowchart {
+        svg_renderer::render_with_config(&layout_result, theme, &parsed_source.config)
+    } else {
+        svg_renderer::render(&layout_result, theme)
+    };
 
     Ok(svg)
+}
+
+/// Strip a leading Mermaid YAML frontmatter block delimited by `---` lines.
+///
+/// Mermaid supports frontmatter at the start of a diagram for per-diagram
+/// metadata and configuration. Use `parse_mermaid_frontmatter` to access parsed
+/// metadata and config values.
+pub fn strip_mermaid_frontmatter(source: &str) -> Cow<'_, str> {
+    parse_mermaid_frontmatter(source).body
 }
 
 fn first_diagram_type_token(input: &str) -> Option<&str> {
@@ -216,6 +246,172 @@ mod tests {
 
         let result = render_mermaid_to_svg(mermaid, None);
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_removes_leading_config_block() {
+        let source = r#"---
+config:
+  theme: default
+---
+xychart-beta
+  title "x"
+"#;
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(
+            stripped,
+            r#"xychart-beta
+  title "x"
+"#
+        );
+        assert!(matches!(stripped, std::borrow::Cow::Owned(_)));
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_preserves_source_without_frontmatter() {
+        let source = "graph TD\nA --> B\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, source);
+        assert!(matches!(stripped, std::borrow::Cow::Borrowed(_)));
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_skips_leading_blank_lines() {
+        let source = r#"
+
+   
+---
+config:
+  theme: dark
+---
+pie
+  "a" : 1
+"#;
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(
+            stripped,
+            r#"pie
+  "a" : 1
+"#
+        );
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_handles_crlf_line_endings() {
+        let source = "---\r\nconfig:\r\n  theme: default\r\n---\r\nflowchart TD\r\nA --> B\r\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, "flowchart TD\r\nA --> B\r\n");
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_leaves_unterminated_block() {
+        let source = "---\nconfig:\n  theme: default\nflowchart TD\nA --> B\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, source);
+        assert!(matches!(stripped, std::borrow::Cow::Borrowed(_)));
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_handles_only_frontmatter_no_body() {
+        let source = "---\nconfig: {}\n---\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, "");
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_handles_frontmatter_without_trailing_newline() {
+        let source = "---\nfoo: bar\n---";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, "");
+    }
+
+    #[test]
+    fn test_strip_mermaid_frontmatter_treats_indented_dashes_as_delimiter() {
+        let source = "\t---\n  config: x\n  ---\nflowchart TD\nA --> B\n";
+        let stripped = strip_mermaid_frontmatter(source);
+        assert_eq!(stripped, "flowchart TD\nA --> B\n");
+    }
+
+    #[test]
+    fn test_render_mermaid_to_svg_dispatches_after_frontmatter() {
+        let mermaid = r#"---
+config:
+  theme: default
+---
+xychart-beta
+    title Demo
+    x-axis 0 --> 10
+    y-axis 0 --> 100
+    line [5, 10, 20, 40]"#;
+
+        let result = render_mermaid_to_svg(mermaid, None);
+        let svg = match result {
+            Ok(svg) => svg,
+            Err(err) => panic!("expected ok result, got error: {err}"),
+        };
+        assert!(svg.contains("<svg"));
+        assert!(svg.contains("Demo"));
+    }
+
+    #[test]
+    fn test_render_mermaid_to_svg_applies_frontmatter_theme_values() {
+        let mermaid = r#"---
+config:
+  theme: dark
+---
+graph TD
+    A --> B"#;
+
+        let result = render_mermaid_to_svg(mermaid, None);
+        let svg = match result {
+            Ok(svg) => svg,
+            Err(err) => panic!("expected ok result, got error: {err}"),
+        };
+        assert!(svg.contains("background-color: #1e1e1e"));
+    }
+
+    #[test]
+    fn test_render_mermaid_to_svg_explicit_theme_overrides_frontmatter_theme() {
+        let mermaid = r##"---
+config:
+  theme: dark
+  themeVariables:
+    background: "#101010"
+---
+graph TD
+    A --> B"##;
+
+        let theme = MermaidTheme::light();
+        let result = render_mermaid_to_svg(mermaid, Some(&theme));
+        let svg = match result {
+            Ok(svg) => svg,
+            Err(err) => panic!("expected ok result, got error: {err}"),
+        };
+        assert!(svg.contains("background-color: #ffffff"));
+        assert!(!svg.contains("background-color: #101010"));
+    }
+
+    #[test]
+    fn test_render_mermaid_to_svg_applies_flowchart_frontmatter_render_config() {
+        let mermaid = r#"---
+config:
+  fontFamily: Inter
+  fontSize: 21px
+  flowchart:
+    curve: linear
+---
+flowchart TD
+    A[Start] --> B[End]"#;
+
+        let result = render_mermaid_to_svg(mermaid, None);
+        let svg = match result {
+            Ok(svg) => svg,
+            Err(err) => panic!("expected ok result, got error: {err}"),
+        };
+        assert!(svg.contains("font-family=\"Inter\""));
+        assert!(svg.contains("font-size=\"21\""));
+        assert!(svg.contains("<path d=\"M"));
+        assert!(svg.contains("L"));
     }
 
     #[test]

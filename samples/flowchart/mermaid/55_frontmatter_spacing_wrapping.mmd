@@ -1,0 +1,16 @@
+---
+config:
+  flowchart:
+    nodeSpacing: 90
+    rankSpacing: 110
+    padding: 6
+    wrappingWidth: 90
+---
+flowchart TD
+    Start[Spacing and wrapping fixture] --> LongNode["This node label is intentionally long so wrappingWidth changes the node shape"]
+    LongNode -->|This edge label is also intentionally long for wrapping| Decision{Should wrapped labels stay readable?}
+    Decision -->|Yes because config applies| Done[Done]
+    subgraph WrappedTitle["A subgraph title that should wrap"]
+        InnerA[Inner node with compact padding] --> InnerB[Another wrapped inner node label]
+    end
+    Decision --> WrappedTitle
