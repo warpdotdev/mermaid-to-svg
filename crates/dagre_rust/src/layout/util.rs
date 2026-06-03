@@ -160,7 +160,7 @@ pub fn intersect_rect(rect: &Rect, point: &GraphEdgePoint) -> GraphEdgePoint {
   let h = rect.height / 2.0;
 
   if dx == 0.0 && dy == 0.0 {
-    panic!("Not possible to find intersection inside of the rectangle");
+    return GraphEdgePoint { x: x + w, y };
   }
 
   let (sx, sy) = if (dy.abs() * w) > (dx.abs() * h) {
@@ -180,6 +180,31 @@ pub fn intersect_rect(rect: &Rect, point: &GraphEdgePoint) -> GraphEdgePoint {
   };
 
   GraphEdgePoint { x: x + sx, y: y + sy }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  fn assert_close(left: f32, right: f32) {
+    assert!((left - right).abs() < f32::EPSILON);
+  }
+
+  #[test]
+  fn intersect_rect_returns_boundary_point_for_center_point() {
+    let rect = Rect {
+      x: 10.0,
+      y: 20.0,
+      width: 8.0,
+      height: 4.0,
+    };
+    let point = GraphEdgePoint { x: 10.0, y: 20.0 };
+
+    let intersection = intersect_rect(&rect, &point);
+
+    assert_close(intersection.x, 14.0);
+    assert_close(intersection.y, 20.0);
+  }
 }
 
 /*
