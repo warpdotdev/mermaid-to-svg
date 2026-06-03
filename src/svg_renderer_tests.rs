@@ -25,6 +25,26 @@ fn test_basic_svg_structure() {
     assert!(svg.contains("</svg>"));
     assert!(svg.contains("Test"));
 }
+#[test]
+fn test_svg_background_is_rasterizable_geometry() {
+    let graph = FlowchartGraph {
+        direction: GraphDirection::TopToBottom,
+        statements: vec![Statement::Node(Node {
+            id: "A".to_string(),
+            label: Some("Test".to_string()),
+            shape: NodeShape::Rectangle,
+        })],
+    };
+
+    let layout = compute_layout(&graph);
+    let mut theme = MermaidTheme::default();
+    theme.background = "#010203".to_string();
+    let svg = render(&layout, &theme);
+
+    assert!(svg.contains("style=\"background-color: #010203;\""));
+    assert!(svg.contains(r##"<rect x="0" y="0" width=""##));
+    assert!(svg.contains(r##"fill="#010203" stroke="none"/>"##));
+}
 
 #[test]
 fn test_render_with_config_applies_font_family_and_size() {

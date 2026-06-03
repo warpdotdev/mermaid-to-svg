@@ -368,6 +368,7 @@ graph TD
             Err(err) => panic!("expected ok result, got error: {err}"),
         };
         assert!(svg.contains("background-color: #1e1e1e"));
+        assert!(svg.contains(r##"fill="#1e1e1e" stroke="none"/>"##));
     }
 
     #[test]

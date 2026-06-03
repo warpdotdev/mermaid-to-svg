@@ -160,13 +160,21 @@ impl<'a> SvgRenderer<'a> {
     }
 
     /// Matches mermaid's SVG behavior: sizing via setupGraphViewbox.js and background via SVG style
-    /// (mermaid-cli src/index.js sets svg.style.backgroundColor).
+    /// (mermaid-cli src/index.js sets svg.style.backgroundColor), with a background rect for rasterizers.
     fn write_header(&mut self) {
         self.output.push_str(&format!(
             r#"<?xml version="1.0" encoding="UTF-8"?>
 <svg width="{:.0}" height="{:.0}" viewBox="0 0 {:.0} {:.0}" xmlns="http://www.w3.org/2000/svg" style="background-color: {};">
+<rect x="0" y="0" width="{:.0}" height="{:.0}" fill="{}" stroke="none"/>
 "#,
-            self.width, self.height, self.width, self.height, self.theme.background
+            self.width,
+            self.height,
+            self.width,
+            self.height,
+            self.theme.background,
+            self.width,
+            self.height,
+            self.theme.background
         ));
     }
 
