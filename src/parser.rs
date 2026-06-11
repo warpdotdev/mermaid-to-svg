@@ -285,7 +285,7 @@ impl<'a> Parser<'a> {
     }
 
     fn find_edge_start(&self, s: &str) -> Option<usize> {
-        let patterns = ["-->", "---", "-.->", "-.-", "-.", "==>", "==="];
+        let patterns = ["-->", "---", "-.->", "-.-", "-.", "==>", "===", "--", "=="];
         patterns.iter().filter_map(|p| s.find(p)).min()
     }
 
@@ -332,10 +332,45 @@ impl<'a> Parser<'a> {
             }
         }
 
+        if let Some(result) = self.parse_labeled_edge_syntax(s) {
+            return Ok(result);
+        }
+
         Err(MermaidError::ParseError {
             line: self.current_line + 1,
             message: format!("Invalid edge syntax: {}", s),
         })
+    }
+
+    /// Parses mermaid's inline labeled edge forms: `-- text -->`, `-- text ---`,
+    /// `== text ==>`, and `== text ===` (including long-arrow variants like
+    /// `-- text --->`). Returns the edge style, label, and consumed length.
+    fn parse_labeled_edge_syntax(&self, s: &str) -> Option<(EdgeStyle, Option<String>, usize)> {
+        let forms = [
+            ("--", "-->", EdgeStyle::Arrow, "---", EdgeStyle::Line),
+            ("==", "==>", EdgeStyle::ThickArrow, "===", EdgeStyle::ThickLine),
+        ];
+        for (open, arrow_close, arrow_style, line_close, line_style) in forms {
+            let Some(after_open) = s.strip_prefix(open) else {
+                continue;
+            };
+            let arrow_idx = after_open.find(arrow_close);
+            let line_idx = after_open.find(line_close);
+            let (idx, mut close_len, mut style) = match (arrow_idx, line_idx) {
+                (Some(a), Some(l)) if l < a => (l, line_close.len(), line_style),
+                (Some(a), _) => (a, arrow_close.len(), arrow_style),
+                (None, Some(l)) => (l, line_close.len(), line_style),
+                (None, None) => continue,
+            };
+            if style == line_style && after_open[idx + close_len..].starts_with('>') {
+                close_len += 1;
+                style = arrow_style;
+            }
+            let label = normalize_label(&after_open[..idx]);
+            let total_len = open.len() + idx + close_len;
+            return Some((style, Some(label), total_len));
+        }
+        None
     }
 
     fn extract_node_id(&self, s: &str) -> String {
