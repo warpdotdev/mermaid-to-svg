@@ -187,6 +187,100 @@ fn test_edges_to_subgraphs_do_not_create_rendered_nodes() {
 }
 
 #[test]
+fn test_connected_subgraphs_do_not_overlap() {
+    let graph = parse_mermaid(
+        r#"flowchart LR
+    subgraph Normal flow
+        R[one] --> P[two]
+        P --> A[three]
+    end
+    subgraph Retry flow
+        S[four] --> RP[five]
+        TC[six] --> E[seven]
+        RP --> E
+        E --> SY[eight]
+        SY --> A
+    end
+    A --> DS[nine]"#,
+    )
+    .unwrap();
+
+    let result = compute_layout(&graph);
+
+    assert_eq!(result.subgraphs.len(), 2);
+    let sg_a = &result.subgraphs[0];
+    let sg_b = &result.subgraphs[1];
+    let subgraphs_overlap = sg_a.x < sg_b.x + sg_b.width
+        && sg_b.x < sg_a.x + sg_a.width
+        && sg_a.y < sg_b.y + sg_b.height
+        && sg_b.y < sg_a.y + sg_a.height;
+    assert!(
+        !subgraphs_overlap,
+        "subgraph rects should not overlap: {:?} vs {:?}",
+        (sg_a.x, sg_a.y, sg_a.width, sg_a.height),
+        (sg_b.x, sg_b.y, sg_b.width, sg_b.height)
+    );
+
+    let nodes: Vec<&LayoutNode> = result.nodes.values().collect();
+    for i in 0..nodes.len() {
+        for j in (i + 1)..nodes.len() {
+            let a = nodes[i];
+            let b = nodes[j];
+            let nodes_overlap = (a.x - b.x).abs() < (a.width + b.width) / 2.0
+                && (a.y - b.y).abs() < (a.height + b.height) / 2.0;
+            assert!(!nodes_overlap, "nodes {} and {} overlap", a.id, b.id);
+        }
+    }
+}
+
+#[test]
+fn test_subgraph_rects_separated_with_long_labels_and_labeled_edges() {
+    let graph = parse_mermaid(
+        r#"flowchart LR
+  subgraph Normal flow
+    R["standalone reasoning msg<br/>(history)"] --> P["pendingReasoning<br/>util.go"]
+    P --> A["assistant tool-call msg<br/>+ reasoning_content"]
+  end
+  subgraph Retry flow
+    S["stream reasoning blocks"] --> RP["reasoningProcessor<br/>AccumulatedReasoning()"]
+    TC["invalid tool call"] --> E["InvalidNativeToolCallError"]
+    RP -- "enrich (xml/plaintext processor)" --> E
+    E -- "Reprompt()" --> SY["synthetic ToolCall.Reasoning"]
+    SY --> A
+  end
+  A --> DS["DeepSeek API"]"#,
+    )
+    .unwrap();
+
+    let result = compute_layout(&graph);
+
+    assert_eq!(result.subgraphs.len(), 2);
+    assert_eq!(result.nodes.len(), 9);
+    let sg_a = &result.subgraphs[0];
+    let sg_b = &result.subgraphs[1];
+    let subgraphs_overlap = sg_a.x < sg_b.x + sg_b.width
+        && sg_b.x < sg_a.x + sg_a.width
+        && sg_a.y < sg_b.y + sg_b.height
+        && sg_b.y < sg_a.y + sg_a.height;
+    assert!(
+        !subgraphs_overlap,
+        "subgraph rects should not overlap: {:?} vs {:?}",
+        (sg_a.x, sg_a.y, sg_a.width, sg_a.height),
+        (sg_b.x, sg_b.y, sg_b.width, sg_b.height)
+    );
+
+    let enrich_edge = result
+        .edges
+        .iter()
+        .find(|e| e.from == "RP" && e.to == "E")
+        .expect("expected RP -> E edge");
+    assert_eq!(
+        enrich_edge.label,
+        Some("enrich (xml/plaintext processor)".to_string())
+    );
+}
+
+#[test]
 fn test_split_edges_route_through_target_lane_top_to_bottom() {
     let graph = FlowchartGraph {
         direction: GraphDirection::TopToBottom,

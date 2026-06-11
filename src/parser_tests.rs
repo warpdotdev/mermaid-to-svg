@@ -176,6 +176,86 @@ fn test_parse_dotted_arrow_with_dot_delimited_label() {
 }
 
 #[test]
+fn test_parse_dash_dash_quoted_label_with_parens() {
+    let input = "graph TD\n    E -- \"Reprompt()\" --> SY[synthetic]";
+    let result = parse_mermaid(input).unwrap();
+
+    let edges: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Edge(e) => Some(e),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(edges.len(), 1);
+    assert_eq!(edges[0].from, "E");
+    assert_eq!(edges[0].to, "SY");
+    assert_eq!(edges[0].style, EdgeStyle::Arrow);
+    assert_eq!(edges[0].label, Some("Reprompt()".to_string()));
+}
+
+#[test]
+fn test_parse_dash_dash_label_preserves_node_shapes() {
+    let input = "graph LR\n    A[start] -- label one --> B(end)";
+    let result = parse_mermaid(input).unwrap();
+
+    let nodes: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Node(n) => Some(n),
+            _ => None,
+        })
+        .collect();
+    let edges: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Edge(e) => Some(e),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(nodes.len(), 2);
+    assert_eq!(nodes[0].id, "A");
+    assert_eq!(nodes[0].label, Some("start".to_string()));
+    assert_eq!(nodes[0].shape, NodeShape::Rectangle);
+    assert_eq!(nodes[1].id, "B");
+    assert_eq!(nodes[1].label, Some("end".to_string()));
+    assert_eq!(nodes[1].shape, NodeShape::RoundedRectangle);
+    assert_eq!(edges.len(), 1);
+    assert_eq!(edges[0].label, Some("label one".to_string()));
+    assert_eq!(edges[0].style, EdgeStyle::Arrow);
+}
+
+#[test]
+fn test_parse_labeled_thick_and_line_edges() {
+    let input = "graph LR\n    A --> B\n    B == slow ==> C\n    C -- plain --- D";
+    let result = parse_mermaid(input).unwrap();
+
+    let edges: Vec<_> = result
+        .statements
+        .iter()
+        .filter_map(|s| match s {
+            Statement::Edge(e) => Some(e),
+            _ => None,
+        })
+        .collect();
+
+    assert_eq!(edges.len(), 3);
+    assert_eq!(edges[1].from, "B");
+    assert_eq!(edges[1].to, "C");
+    assert_eq!(edges[1].style, EdgeStyle::ThickArrow);
+    assert_eq!(edges[1].label, Some("slow".to_string()));
+    assert_eq!(edges[2].from, "C");
+    assert_eq!(edges[2].to, "D");
+    assert_eq!(edges[2].style, EdgeStyle::Line);
+    assert_eq!(edges[2].label, Some("plain".to_string()));
+}
+
+#[test]
 fn test_parse_rounded_node() {
     let input = "graph TD\n    A(Rounded)";
     let result = parse_mermaid(input).unwrap();
