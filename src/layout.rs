@@ -1106,7 +1106,14 @@ impl<'a> LayoutEngine<'a> {
             );
         }
 
-        for (node_id, sg_id) in &self.node_to_subgraph {
+        let mut parented_nodes: Vec<_> = self.node_to_subgraph.iter().collect();
+        parented_nodes.sort_by_key(|(node_id, _)| {
+            self.nodes
+                .get(*node_id)
+                .map(|info| info.order)
+                .unwrap_or(usize::MAX)
+        });
+        for (node_id, sg_id) in parented_nodes {
             let _ = g.set_parent(node_id, Some(sg_id.clone()));
         }
 
