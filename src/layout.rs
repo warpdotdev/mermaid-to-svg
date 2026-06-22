@@ -317,6 +317,27 @@ impl<'a> LayoutEngine<'a> {
                     GraphDirection::TopToBottom | GraphDirection::BottomToTop
                 );
 
+                if e.from == e.to {
+                    let mut points =
+                        Self::compute_self_loop_points(&from_node, is_vertical);
+                    self.clip_edge_to_boundaries(&mut points, &from_node, &to_node);
+                    let label_pos = e.label.as_ref().and_then(|label| {
+                        if label.trim().is_empty() {
+                            None
+                        } else {
+                            Some(Self::edge_label_midpoint(&points))
+                        }
+                    });
+                    return Some(LayoutEdge {
+                        from: e.from.clone(),
+                        to: e.to.clone(),
+                        label: e.label.clone(),
+                        style: e.style,
+                        points,
+                        label_pos,
+                    });
+                }
+
                 let dagre_points = edge_points.get(&idx).cloned().unwrap_or_else(|| {
                     self.compute_edge_points_with_obstacles(&from_node, &to_node, &layout_nodes)
                 });
@@ -3295,6 +3316,34 @@ impl<'a> LayoutEngine<'a> {
             }
         }
         false
+    }
+
+    fn compute_self_loop_points(node: &LayoutNode, is_vertical: bool) -> Vec<(f64, f64)> {
+        let loop_size = 40.0_f64.max(node.width * 0.35).min(60.0);
+        let hw = node.width / 2.0;
+        let hh = node.height / 2.0;
+
+        if is_vertical {
+            let right_x = node.x + hw;
+            let h4 = hh / 2.0;
+            vec![
+                (right_x, node.y - h4),
+                (right_x + loop_size * 0.8, node.y - loop_size * 0.6),
+                (right_x + loop_size * 1.2, node.y),
+                (right_x + loop_size * 0.8, node.y + loop_size * 0.6),
+                (right_x, node.y + h4),
+            ]
+        } else {
+            let top_y = node.y - hh;
+            let w4 = hw / 2.0;
+            vec![
+                (node.x - w4, top_y),
+                (node.x - loop_size * 0.6, top_y - loop_size * 0.8),
+                (node.x, top_y - loop_size * 1.2),
+                (node.x + loop_size * 0.6, top_y - loop_size * 0.8),
+                (node.x + w4, top_y),
+            ]
+        }
     }
 
     fn build_smooth_u_path(

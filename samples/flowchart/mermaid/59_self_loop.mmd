@@ -1,0 +1,23 @@
+flowchart TB
+  subgraph Shared["Shared core (execute.rs)"]
+    ATE["AgentToolExecutor<br/>(top-level AIAgentActionType dispatch)"]
+    SST["trait SurfaceSpecificToolExecutor"]
+    ATAM["AgentToolActionModel<br/>(queue / running / finished / ordering)"]
+  end
+
+  subgraph GUI["GUI surface"]
+    BAM["BlocklistAIActionModel<br/>holds: tools: AgentToolActionModel"]
+    BAE["BlocklistAIActionExecutor<br/>impl SurfaceSpecificToolExecutor"]
+  end
+
+  subgraph TUI["TUI surface"]
+    TAM["TuiToolActionModel<br/>holds: tools: AgentToolActionModel"]
+    TTE["TuiToolExecutor<br/>impl SurfaceSpecificToolExecutor"]
+  end
+
+  BAM --> BAE --> ATE
+  TAM --> TTE --> ATE
+  ATE -->|shared tools: read/grep/glob| ATE
+  ATE -->|shell, file edits, other| SST
+  BAM --> ATAM
+  TAM --> ATAM

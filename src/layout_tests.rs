@@ -704,3 +704,93 @@ fn test_longest_path_ranking() {
     assert!(node_d.y > node_b.y);
     assert!(node_a.y < node_b.y);
 }
+
+#[test]
+fn test_self_loop_edge_produces_valid_points() {
+    let graph = parse_mermaid(
+        r#"flowchart TB
+  A["AgentToolExecutor"] -->|shared tools| A
+  A --> B[Other]"#,
+    )
+    .unwrap();
+
+    let result = compute_layout(&graph);
+
+    let self_edge = result
+        .edges
+        .iter()
+        .find(|e| e.from == "A" && e.to == "A")
+        .expect("self-loop edge should be present");
+
+    assert!(
+        self_edge.points.len() >= 2,
+        "self-loop should have at least 2 points, got {}",
+        self_edge.points.len()
+    );
+
+    let node_a = &result.nodes["A"];
+    let max_x = self_edge
+        .points
+        .iter()
+        .map(|(x, _)| *x)
+        .fold(f64::NEG_INFINITY, f64::max);
+    assert!(
+        max_x > node_a.x + node_a.width / 2.0,
+        "self-loop should extend to the right of node A"
+    );
+
+    assert_eq!(self_edge.label.as_deref(), Some("shared tools"));
+    assert!(
+        self_edge.label_pos.is_some(),
+        "labeled self-loop should have a label position"
+    );
+}
+
+#[test]
+fn test_self_loop_in_subgraph_does_not_overlap_siblings() {
+    let graph = parse_mermaid(
+        r#"flowchart TB
+  subgraph Shared["Shared core"]
+    ATE["AgentToolExecutor"] -->|shared tools| ATE
+    SST["trait SurfaceSpecificToolExecutor"]
+    ATAM["AgentToolActionModel"]
+  end"#,
+    )
+    .unwrap();
+
+    let result = compute_layout(&graph);
+
+    let self_edge = result
+        .edges
+        .iter()
+        .find(|e| e.from == "ATE" && e.to == "ATE")
+        .expect("self-loop edge should be present");
+
+    assert!(self_edge.points.len() >= 2);
+
+    let node_ate = &result.nodes["ATE"];
+    let node_sst = result.nodes.get("SST").expect("SST should exist");
+    let node_atam = result.nodes.get("ATAM").expect("ATAM should exist");
+
+    let self_loop_max_x = self_edge
+        .points
+        .iter()
+        .map(|(x, _)| *x)
+        .fold(f64::NEG_INFINITY, f64::max);
+    let self_loop_min_x = self_edge
+        .points
+        .iter()
+        .map(|(x, _)| *x)
+        .fold(f64::INFINITY, f64::min);
+
+    assert!(
+        self_loop_max_x > node_ate.x,
+        "self-loop should extend beyond node center"
+    );
+    assert!(
+        self_loop_min_x >= node_ate.x - node_ate.width / 2.0 - 5.0,
+        "self-loop start should not intrude far into neighboring nodes"
+    );
+
+    let _ = (node_sst, node_atam);
+}
