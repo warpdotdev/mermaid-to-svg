@@ -262,14 +262,15 @@ impl<'a> LayoutEngine<'a> {
         dagre_layout(&mut dagre_graph);
         let (mut positions, mut edge_points, mut edge_label_positions) =
             self.extract_layout_from_dagre(&dagre_graph, &edge_map);
-        if self.is_state_diagram {
-            self.snap_state_ranks(&mut positions, &back_edges);
-            self.align_state_terminal_singletons(&mut positions, &back_edges);
-        }
         let is_vertical = matches!(
             self.graph.direction,
             GraphDirection::TopToBottom | GraphDirection::BottomToTop
         );
+        self.fix_subgraph_internal_ranks(&mut positions, is_vertical);
+        if self.is_state_diagram {
+            self.snap_state_ranks(&mut positions, &back_edges);
+            self.align_state_terminal_singletons(&mut positions, &back_edges);
+        }
         if center_subgraph_nodes {
             self.center_nodes_in_subgraphs(&mut positions, is_vertical);
             self.resolve_subgraph_overlaps(
@@ -3316,6 +3317,141 @@ impl<'a> LayoutEngine<'a> {
             }
         }
         false
+    }
+
+    fn fix_subgraph_internal_ranks(&self, positions: &mut PositionMap, is_vertical: bool) {
+        for sg in &self.subgraphs {
+            let sg_id = &sg.id;
+
+            let sg_nodes: Vec<String> = self
+                .node_to_subgraph
+                .iter()
+                .filter(|(_, id)| *id == sg_id)
+                .map(|(node_id, _)| node_id.clone())
+                .collect();
+
+            if sg_nodes.len() < 2 {
+                continue;
+            }
+
+            let sg_node_set: HashSet<String> = sg_nodes.iter().cloned().collect();
+
+            let internal_edges: Vec<&EdgeInfo> = self
+                .edges
+                .iter()
+                .filter(|e| {
+                    e.from != e.to
+                        && sg_node_set.contains(&e.from)
+                        && sg_node_set.contains(&e.to)
+                })
+                .collect();
+
+            if internal_edges.is_empty() {
+                continue;
+            }
+
+            let collapsed = internal_edges.iter().any(|e| {
+                let fc = positions
+                    .get(&e.from)
+                    .map(|(x, y)| if is_vertical { *y } else { *x });
+                let tc = positions
+                    .get(&e.to)
+                    .map(|(x, y)| if is_vertical { *y } else { *x });
+                matches!((fc, tc), (Some(f), Some(t)) if (f - t).abs() < 1.0)
+            });
+
+            if !collapsed {
+                continue;
+            }
+
+            let mut ranks: HashMap<String, i32> =
+                sg_nodes.iter().map(|id| (id.clone(), 0)).collect();
+            let mut indegree: HashMap<String, usize> =
+                sg_nodes.iter().map(|id| (id.clone(), 0)).collect();
+            for e in &internal_edges {
+                *indegree.entry(e.to.clone()).or_insert(0) += 1;
+            }
+            let mut queue: Vec<String> = indegree
+                .iter()
+                .filter(|(_, &d)| d == 0)
+                .map(|(id, _)| id.clone())
+                .collect();
+            queue.sort_by_key(|id| self.nodes.get(id).map(|n| n.order).unwrap_or(usize::MAX));
+
+            while !queue.is_empty() {
+                let node = queue.remove(0);
+                let node_rank = *ranks.get(&node).unwrap_or(&0);
+                for e in &internal_edges {
+                    if e.from != node {
+                        continue;
+                    }
+                    let new_rank = node_rank + 1;
+                    let entry = ranks.entry(e.to.clone()).or_insert(0);
+                    if new_rank > *entry {
+                        *entry = new_rank;
+                    }
+                    if let Some(d) = indegree.get_mut(&e.to) {
+                        *d = d.saturating_sub(1);
+                        if *d == 0 {
+                            queue.push(e.to.clone());
+                            queue.sort_by_key(|id| {
+                                self.nodes.get(id).map(|n| n.order).unwrap_or(usize::MAX)
+                            });
+                        }
+                    }
+                }
+            }
+
+            let max_rank = ranks.values().copied().max().unwrap_or(0);
+            if max_rank == 0 {
+                continue;
+            }
+
+            let mut rank_sizes: Vec<f64> = vec![0.0; (max_rank + 1) as usize];
+            for node_id in &sg_nodes {
+                let rank = *ranks.get(node_id).unwrap_or(&0) as usize;
+                if let Some(info) = self.nodes.get(node_id) {
+                    let size = if is_vertical { info.height } else { info.width };
+                    rank_sizes[rank] = rank_sizes[rank].max(size);
+                }
+            }
+
+            let mut rank_centers: Vec<f64> = vec![0.0; (max_rank + 1) as usize];
+            let mut pos = 0.0_f64;
+            for rank in 0..=(max_rank as usize) {
+                if rank == 0 {
+                    pos = rank_sizes[0] / 2.0;
+                } else {
+                    pos += rank_sizes[rank - 1] / 2.0 + RANK_SEP + rank_sizes[rank] / 2.0;
+                }
+                rank_centers[rank] = pos;
+            }
+
+            let layout_span_center = (rank_centers[0] + rank_centers[max_rank as usize]) / 2.0;
+
+            let coords: Vec<f64> = sg_nodes
+                .iter()
+                .filter_map(|id| positions.get(id))
+                .map(|(x, y)| if is_vertical { *y } else { *x })
+                .collect();
+            if coords.is_empty() {
+                continue;
+            }
+            let sg_center = coords.iter().sum::<f64>() / coords.len() as f64;
+            let offset = sg_center - layout_span_center;
+
+            for node_id in &sg_nodes {
+                let rank = *ranks.get(node_id).unwrap_or(&0) as usize;
+                let new_coord = offset + rank_centers[rank];
+                if let Some((x, y)) = positions.get_mut(node_id) {
+                    if is_vertical {
+                        *y = new_coord;
+                    } else {
+                        *x = new_coord;
+                    }
+                }
+            }
+        }
     }
 
     fn compute_self_loop_points(node: &LayoutNode, is_vertical: bool) -> Vec<(f64, f64)> {
