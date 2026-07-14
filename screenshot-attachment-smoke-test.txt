@@ -1,0 +1,2 @@
+This file exists only to create a draft pull request that exercises Oz screenshot attachment rendering in the PR body.
+It is a smoke-test artifact and is not intended to be merged as-is.
